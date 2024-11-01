@@ -6,15 +6,13 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [location, setLocation] = useState('');
   const [image, setImage] = useState(null);
 
-  // Preencher os campos do formulário se estiver editando
   useEffect(() => {
     if (casaraoData) {
       setName(casaraoData.name);
       setDescription(casaraoData.description);
       setLocation(casaraoData.location);
-      setImage(null); // Se você não deseja que a imagem anterior seja exibida
+      setImage(null); // Mantenha como null se não quiser exibir a imagem anterior
     } else {
-      // Limpar os campos se não houver dados de casarão
       setName('');
       setDescription('');
       setLocation('');
@@ -31,7 +29,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     formData.append('location', location);
     formData.append('image', image);
 
-    onSubmit(formData);
+    onSubmit(formData); // Passa os dados para o componente pai
+
     // Limpar os campos após o envio
     setName('');
     setDescription('');
@@ -82,6 +81,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     </div>
   );
 }
+
 
 const styles = {
   container: {
