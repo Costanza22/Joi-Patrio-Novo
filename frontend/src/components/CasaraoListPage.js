@@ -61,13 +61,35 @@ function CasaraoListPage({ isAdmin }) {
       : [...prev, casarao]
     );
   };
-
-  const handleCasaraoSubmit = async (novoCasarao, id) => {
+  const handleDeleteCasarao = async (casaraoId) => {
     try {
-      const method = id ? 'PUT' : 'POST';
-      const url = id ? `http://localhost:5000/casaroes/${id}` : 'http://localhost:5000/casaroes';
+      const response = await fetch(`http://localhost:5000/casaroes/${casaraoId}`, {
+        method: 'DELETE',
+      });
+  
+      if (!response.ok) throw new Error(`Erro ao excluir o casarão: ${response.statusText}`);
+  
+      // Atualizar a lista de casarões após a exclusão
+      setCasaroes(prev => prev.filter(casarao => casarao.id !== casaraoId));
+    } catch (error) {
+      console.error('Erro ao excluir o casarão:', error);
+      alert('Erro ao excluir o casarão: ' + error.message);
+    }
+  };
+  
 
-      const response = await fetch(url, { method, body: novoCasarao });
+  const handleCasaraoSubmit = async (novoCasarao) => {
+    try {
+      const method = casaraoToEdit?.id ? 'PUT' : 'POST';
+      const url = casaraoToEdit?.id 
+        ? `http://localhost:5000/casaroes/${casaraoToEdit.id}`
+        : 'http://localhost:5000/casaroes';
+  
+      const response = await fetch(url, {
+        method,
+        body: novoCasarao,
+      });
+      
       if (!response.ok) throw new Error(`Erro ao salvar o casarão: ${response.statusText}`);
       
       fetchCasaroes();
@@ -123,10 +145,15 @@ function CasaraoListPage({ isAdmin }) {
                         </div>
                       )}
                       {isAdmin && (
-                        <button onClick={() => handleEditClick(casarao)} style={styles.editButton}>
-                          <MdOutlineModeEdit /> Editar
-                        </button>
-                      )}
+  <>
+    <button onClick={() => handleEditClick(casarao)} style={styles.editButton}>
+      <MdOutlineModeEdit /> Editar
+    </button>
+    <button onClick={() => handleDeleteCasarao(casarao.id)} style={styles.deleteButton}>
+      Excluir
+    </button>
+  </>
+)}
                       {!isAdmin && (
                         <>
                           <button onClick={() => handleFavoritar(casarao)} style={styles.favoritoButton}>
@@ -240,6 +267,16 @@ const styles = {
     cursor: 'pointer',
     marginLeft: '10px',
   },
+  deleteButton: {
+    backgroundColor: 'red',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '5px 10px',
+    cursor: 'pointer',
+    marginLeft: '10px',
+  },
+
 
 };
 

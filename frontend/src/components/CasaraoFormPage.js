@@ -22,16 +22,18 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
     formData.append('location', location);
     formData.append('image', image);
-
-    onSubmit(formData); // Passa os dados para o componente pai
-
-    // Limpar os campos após o envio
+  
+    if (casaraoData?.id) {
+      formData.append('id', casaraoData.id); // Inclui o ID se for uma edição
+    }
+  
+    onSubmit(formData);
     setName('');
     setDescription('');
     setLocation('');
