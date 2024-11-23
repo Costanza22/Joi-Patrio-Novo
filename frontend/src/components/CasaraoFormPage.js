@@ -1,49 +1,100 @@
 import React, { useState, useEffect } from 'react';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [cep, setCep] = useState('');
   const [image, setImage] = useState(null);
+  const [constructionDate, setConstructionDate] = useState('');
+  const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
+  const [loadingMap, setLoadingMap] = useState(false); // State for loading map
 
   useEffect(() => {
     if (casaraoData) {
       setName(casaraoData.name);
       setDescription(casaraoData.description);
       setLocation(casaraoData.location);
-      setImage(null); // Mantenha como null se não quiser exibir a imagem anterior
-    } else {
-      setName('');
-      setDescription('');
-      setLocation('');
-      setImage(null);
+      setCep(casaraoData.cep || '');
+      setImage(casaraoData.image_path ? casaraoData.image_path : null);
+      if (casaraoData.constructionDate) {
+        const date = new Date(casaraoData.constructionDate);
+        setConstructionDate(date.toISOString().split('T')[0]);
+      } else {
+        setConstructionDate('');
+      }
     }
   }, [casaraoData]);
 
+  const handleCepChange = async (e) => {
+    setCep(e.target.value);
+
+    if (e.target.value.length === 8) {
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${e.target.value}/json/`);
+        const data = await response.json();
+
+        if (data.localidade) {
+          setLocation(`${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`);
+
+          // Obter coordenadas usando a API de Geocodificação do Google
+          const googleResponse = await fetch(
+            `https://maps.googleapis.com/maps/api/geocode/json?address=${data.logradouro},${data.localidade},${data.uf}&key=YOUR_GOOGLE_API_KEY`
+          );
+          const googleData = await googleResponse.json();
+
+          if (googleData.results.length > 0) {
+            const location = googleData.results[0].geometry.location;
+            setCoordinates(location);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao buscar CEP ou coordenadas:', error);
+      }
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData();
     formData.append('name', name);
     formData.append('description', description);
     formData.append('location', location);
+    formData.append('cep', cep);
     formData.append('image', image);
-  
-    if (casaraoData?.id) {
-      formData.append('id', casaraoData.id); // Inclui o ID se for uma edição
+    formData.append('date', constructionDate);
+    formData.append('latitude', coordinates.lat);
+    formData.append('longitude', coordinates.lng);
+
+    if (constructionDate) {
+      const formattedDate = new Date(constructionDate).toISOString().split('T')[0];
+      formData.append('constructionDate', formattedDate);
+    } else {
+      formData.append('constructionDate', '');
     }
-  
+
+    if (casaraoData?.id) {
+      formData.append('id', casaraoData.id);
+    }
+
     onSubmit(formData);
+
+    // Reset form after submit
     setName('');
     setDescription('');
     setLocation('');
+    setCep('');
+    setConstructionDate('');
     setImage(null);
+    setCoordinates({ lat: null, lng: null });
   };
 
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>{casaraoData ? 'Editar Casarão' : 'Cadastrar Novo Casarão'}</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
+      <form onSubmit={handleSubmit} style={styles.form} encType="multipart/form-data">
         <input
           type="text"
           placeholder="Nome do Casarão"
@@ -67,6 +118,31 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
           required
           style={styles.input}
         />
+        <input
+          type="text"
+          placeholder="CEP"
+          value={cep}
+          onChange={handleCepChange}
+          maxLength="8"
+          style={styles.input}
+        />
+        <input
+          type="date"
+          placeholder="Data de Construção"
+          value={constructionDate}
+          onChange={(e) => setConstructionDate(e.target.value)}
+          style={styles.input}
+        />
+          {image && (
+          <div>
+            <img
+              src={`http://localhost:5000/casaroes/${image}`}
+              alt={name}
+              style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
+            />
+            <p>Imagem atual: {image.name}</p>
+          </div>
+        )}
         <label htmlFor="fileInput" style={styles.fileLabel}>
           {image ? image.name : 'Escolher arquivo'}
         </label>
@@ -76,6 +152,24 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
           onChange={(e) => setImage(e.target.files[0])}
           style={styles.fileInput}
         />
+
+        {/* Mapa do Google dentro do formulário */}
+        <div style={{ width: '100%', height: '300px', marginTop: '20px' }}>
+          <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_API_KEY}>
+            <GoogleMap
+              mapContainerStyle={{ width: '100%', height: '100%' }}
+              center={coordinates.lat && coordinates.lng ? coordinates : { lat: -23.1896, lng: -48.9528 }} // Default position if no coordinates
+              zoom={15}
+              onLoad={() => setLoadingMap(false)} // Set loadingMap to false when map loads
+              onError={() => setLoadingMap(true)} // Handle error in loading map
+            >
+              {coordinates.lat && coordinates.lng && <Marker position={coordinates} />}
+            </GoogleMap>
+          </LoadScript>
+        </div>
+
+        {loadingMap && <p>Carregando mapa...</p>} {/* Display loading message when map is loading */}
+
         <button type="submit" style={styles.submitButton}>
           {casaraoData ? 'Salvar Alterações' : 'Cadastrar'}
         </button>
@@ -88,71 +182,80 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
 const styles = {
   container: {
     padding: '20px',
-    backgroundColor: 'Burlywood',
-    fontFamily: 'Arial, sans-serif',
-    borderRadius: '8px',
-    maxWidth: '400px',
-    margin: '20px auto', // Adiciona margem
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Adiciona sombra ao container
+    backgroundColor: '#f5f5dc', // Paleta mais suave
+    fontFamily: "'Poppins', sans-serif",
+    borderRadius: '10px',
+    maxWidth: '500px',
+    margin: '30px auto',
+    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
   },
   title: {
-    fontSize: '24px',
+    fontSize: '26px',
     color: '#333',
     textAlign: 'center',
-    marginBottom: '20px',
+    marginBottom: '15px',
+    fontWeight: '600',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
   },
   input: {
-    padding: '10px',
-    margin: '5px 0',
-    borderRadius: '5px',
+    padding: '12px',
+    margin: '8px 0',
+    borderRadius: '8px',
     border: '1px solid #ccc',
+    outline: 'none',
+    fontSize: '14px',
+    transition: 'border-color 0.3s',
+  },
+  inputFocus: {
+    borderColor: '#8B4513',
   },
   textarea: {
-    padding: '10px',
-    margin: '5px 0',
-    borderRadius: '5px',
+    padding: '12px',
+    margin: '8px 0',
+    borderRadius: '8px',
     border: '1px solid #ccc',
-    resize: 'vertical', // Permite redimensionar verticalmente
+    resize: 'vertical',
+    outline: 'none',
+    fontSize: '14px',
   },
   fileLabel: {
-    padding: '10px',
-    margin: '5px 0',
-    backgroundColor: '#8B4513', // Cor do botão
+    padding: '12px',
+    margin: '8px 0',
+    backgroundColor: '#8B4513',
     color: '#fff',
-    borderRadius: '5px',
+    borderRadius: '8px',
     cursor: 'pointer',
     textAlign: 'center',
-    display: 'inline-block',
     textDecoration: 'none',
   },
-  fileInput: {
-    display: 'none', // Esconde o input de arquivo padrão
-  },
   submitButton: {
-    padding: '10px 20px',
-    backgroundColor: '#8B4513', // Cor do botão
+    padding: '12px',
+    backgroundColor: '#8B4513',
     color: '#fff',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '8px',
     cursor: 'pointer',
-    marginTop: '10px',
-    transition: 'background-color 0.3s', // Adiciona efeito de transição
+    fontSize: '16px',
+    marginTop: '15px',
+    transition: 'background-color 0.3s, transform 0.2s',
   },
   submitButtonHover: {
-    backgroundColor: '#5C3D2D', // Cor ao passar o mouse
+    backgroundColor: '#5C3D2D',
+    transform: 'scale(1.05)',
   },
+
   imagePreview: {
     marginTop: '10px',
     textAlign: 'center',
   },
   previewImage: {
-    maxWidth: '200px', // Define a largura máxima da imagem
+    maxWidth: '200px', 
     height: 'auto',
   },
+ 
 };
 
 export default CasaraoFormPage;

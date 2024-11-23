@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import CasaraoFormPage from './CasaraoFormPage';
 import { MdOutlineModeEdit } from 'react-icons/md';
-import { IoIosStarOutline, IoMdCheckmarkCircleOutline } from 'react-icons/io'; // Importar o ícone de checkmark
+import { IoIosStarOutline, IoMdCheckmarkCircleOutline } from 'react-icons/io';
+import { BsFillPatchQuestionFill } from 'react-icons/bs';
+
 
 function CasaraoListPage({ isAdmin }) {
   const [casaroes, setCasaroes] = useState([]);
@@ -10,12 +12,16 @@ function CasaraoListPage({ isAdmin }) {
   const [error, setError] = useState(null);
   const [casaraoToEdit, setCasaraoToEdit] = useState(null);
   const [favoritos, setFavoritos] = useState([]);
-  const [visitados, setVisitados] = useState([]); // Estado para casarões visitados
-
+  const [visitados, setVisitados] = useState([]);
+  const [comentarios, setComentarios] = useState({});
+  const [showInput, setShowInput] = useState(false); 
+  const [suggestion, setSuggestion] = useState(''); 
+  const [successMessage, setSuccessMessage] = useState(''); 
   const fetchCasaroes = async () => {
     try {
       const response = await fetch('http://localhost:5000/casaroes');
       if (!response.ok) throw new Error('Erro ao carregar os casarões: ' + response.statusText);
+
       
       const data = await response.json();
       setCasaroes(data);
@@ -45,7 +51,21 @@ function CasaraoListPage({ isAdmin }) {
       fetchCasaroes();
     }
   };
-
+  const handleIconClick = () => {
+    setShowInput(!showInput); // Alterna a exibição do input
+  };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  
+    if (suggestion.trim() === '') {
+      alert('Por favor, digite uma sugestão antes de enviar.');
+      return;
+    }
+  
+    setSuccessMessage('Sugestão enviada com sucesso!');
+    setSuggestion(''); 
+  };
+  
   const handleFavoritar = (casarao) => {
     setFavoritos((prev) => 
       prev.some(favorito => favorito.id === casarao.id) 
@@ -61,22 +81,31 @@ function CasaraoListPage({ isAdmin }) {
       : [...prev, casarao]
     );
   };
-  const handleDeleteCasarao = async (casaraoId) => {
-    try {
-      const response = await fetch(`http://localhost:5000/casaroes/${casaraoId}`, {
-        method: 'DELETE',
-      });
-  
-      if (!response.ok) throw new Error(`Erro ao excluir o casarão: ${response.statusText}`);
-  
-      // Atualizar a lista de casarões após a exclusão
-      setCasaroes(prev => prev.filter(casarao => casarao.id !== casaraoId));
-    } catch (error) {
-      console.error('Erro ao excluir o casarão:', error);
-      alert('Erro ao excluir o casarão: ' + error.message);
-    }
+  const handleSortByName = () => {
+    setCasaroes((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
   };
   
+  const handleFilterVisitados = () => {
+    setCasaroes(visitados);
+  };
+  
+
+ const handleDeleteCasarao = async (casaraoId) => {
+  if (!window.confirm('Tem certeza que deseja excluir este casarão?')) return;
+
+  try {
+    const response = await fetch(`http://localhost:5000/casaroes/${casaraoId}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) throw new Error(`Erro ao excluir o casarão: ${response.statusText}`);
+
+    setCasaroes((prev) => prev.filter((casarao) => casarao.id !== casaraoId));
+  } catch (error) {
+    console.error('Erro ao excluir o casarão:', error);
+    alert('Erro ao excluir o casarão: ' + error.message);
+  }
+};
 
   const handleCasaraoSubmit = async (novoCasarao) => {
     try {
@@ -84,7 +113,6 @@ function CasaraoListPage({ isAdmin }) {
       const url = casaraoToEdit?.id 
         ? `http://localhost:5000/casaroes/${casaraoToEdit.id}`
         : 'http://localhost:5000/casaroes';
-  
       const response = await fetch(url, {
         method,
         body: novoCasarao,
@@ -107,6 +135,13 @@ function CasaraoListPage({ isAdmin }) {
     setShowList(false);
   };
 
+  const handleAddComment = (casaraoId, comment) => {
+    setComentarios((prev) => ({
+      ...prev,
+      [casaraoId]: [...(prev[casaraoId] || []), comment],
+    }));
+  };
+
   return (
     <div style={styles.container}>
       {showCadastro ? (
@@ -116,7 +151,31 @@ function CasaraoListPage({ isAdmin }) {
         />
       ) : (
         <>
-          <h2 style={styles.title}>Lista de Casarões</h2>
+          <h2 style={styles.title}>
+        Lista de Casarões
+        <BsFillPatchQuestionFill onClick={handleIconClick} style={{ cursor: 'pointer', marginLeft: '10px' }} />
+      </h2>
+
+      {showInput && (
+        <div style={styles.formContainer}>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              value={suggestion}
+              onChange={(e) => setSuggestion(e.target.value)}
+              placeholder="Digite sua sugestão"
+              style={styles.input}
+            />
+            <button type="submit" style={styles.button}>
+              Enviar
+            </button>
+          </form>
+        </div>
+      )}
+
+      {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
+    
+    
           <button onClick={handleConsultarClick} style={styles.button}>
             {showList ? 'Fechar Casarões' : 'Consultar Casarões'}
           </button>
@@ -135,25 +194,38 @@ function CasaraoListPage({ isAdmin }) {
                       <h3>{casarao.name}</h3>
                       <p>{casarao.description}</p>
                       <p>{casarao.location}</p>
+                      <p>Data: {casarao.date ? casarao.date.split('T')[0] : 'Data não disponível'}</p>
+
+
+
                       {casarao.image_path && (
-                        <div style={styles.imageContainer}>
-                          <img
-                            src={`http://localhost:5000/${casarao.image_path}`}
-                            alt={casarao.name}
-                            style={styles.image}
-                          />
-                        </div>
+  <div style={styles.imageContainer}>
+    <img
+      src={`http://localhost:5000/${casarao.image_path}`}
+      alt={casarao.name}
+      onError={(e) => {
+        console.error('Erro ao carregar a imagem:', e);
+      }}
+      style={styles.image}
+    />
+  </div>
+
+
+
                       )}
+                      <button onClick={handleSortByName} style={styles.button}>Ordenar por Nome</button>
+<button onClick={handleFilterVisitados} style={styles.button}>Filtrar Visitados</button>
+
                       {isAdmin && (
-  <>
-    <button onClick={() => handleEditClick(casarao)} style={styles.editButton}>
-      <MdOutlineModeEdit /> Editar
-    </button>
-    <button onClick={() => handleDeleteCasarao(casarao.id)} style={styles.deleteButton}>
-      Excluir
-    </button>
-  </>
-)}
+                        <>
+                          <button onClick={() => handleEditClick(casarao)} style={styles.editButton}>
+                            <MdOutlineModeEdit /> Editar
+                          </button>
+                          <button onClick={() => handleDeleteCasarao(casarao.id)} style={styles.deleteButton}>
+                            Excluir
+                          </button>
+                        </>
+                      )}
                       {!isAdmin && (
                         <>
                           <button onClick={() => handleFavoritar(casarao)} style={styles.favoritoButton}>
@@ -164,6 +236,28 @@ function CasaraoListPage({ isAdmin }) {
                           </button>
                         </>
                       )}
+                      
+                      {/* Seção de Comentários */}
+                      <div style={styles.comentariosContainer}>
+                        <h4>Comentários</h4>
+                        <ul>
+  {(comentarios[casarao.id] || []).map((comment) => (
+    <li key={`${casarao.id}-${comment}`}>{comment}</li>
+  ))}
+</ul>
+
+                        <input
+                          type="text"
+                          placeholder="Adicionar um comentário"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.target.value.trim()) {
+                              handleAddComment(casarao.id, e.target.value);
+                              e.target.value = ''; // Limpa o campo de entrada
+                            }
+                          }}
+                          style={styles.comentarioInput}
+                        />
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -199,36 +293,53 @@ function CasaraoListPage({ isAdmin }) {
         </>
       )}
     </div>
+    
   );
 }
+
+
+
 const styles = {
   container: {
-    padding: '20px',
-    backgroundColor: 'Burlywood',
-    fontFamily: 'Arial, sans-serif',
-    borderRadius: '8px',
+    padding: '30px',
+    backgroundColor: '#F9F3E3', // Cor mais suave
+    fontFamily: 'Georgia, serif',
+    borderRadius: '15px', // Bordas mais arredondadas
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)', // Sombra mais intensa
+    transition: 'box-shadow 0.3s ease', // Efeito suave ao passar o mouse
   },
   title: {
-    fontSize: '24px',
-    color: '#333',
+    fontSize: '40px', // Tamanho maior para dar mais impacto
+    color: '#4B2A14', // Cor de destaque mais profunda
     textAlign: 'center',
-    marginBottom: '20px',
+    marginBottom: '25px',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: '4px', // Mais espaçamento para elegância
+    textShadow: '2px 2px 5px rgba(0, 0, 0, 0.15)', // Sombra de texto para destaque
   },
   button: {
     display: 'block',
-    margin: '10px auto',
-    padding: '10px 20px',
-    backgroundColor: '#8B4513',
+    margin: '15px auto',
+    padding: '12px 25px',
+    backgroundColor: '#8B4513', // Cor mais vibrante
     color: '#fff',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '30px', // Bordas mais arredondadas
     cursor: 'pointer',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', // Sombra sutil
+    transition: 'all 0.3s ease',
+  },
+  buttonHover: {
+    backgroundColor: '#6A2E12', // Cor do botão ao passar o mouse
+    transform: 'scale(1.05)', // Efeito de ampliação suave
   },
   listContainer: {
-    backgroundColor: '#FFF8DC',
-    padding: '15px',
-    borderRadius: '5px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
+    backgroundColor: '#FFF8DC', 
+    padding: '20px', // Mais espaçamento
+    borderRadius: '10px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    transition: 'box-shadow 0.3s ease',
   },
   list: {
     listStyleType: 'none',
@@ -236,48 +347,88 @@ const styles = {
   },
   listItem: {
     padding: '15px',
-    marginBottom: '10px',
-    borderRadius: '5px',
+    marginBottom: '15px',
+    borderRadius: '10px',
     backgroundColor: '#F5DEB3',
+    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)', 
+    transition: 'transform 0.3s ease, background-color 0.3s ease',
+  },
+  listItemHover: {
+    transform: 'scale(1.05)',
+    backgroundColor: '#F4C8A1',
+  },
+  
+  imageContainer: {
+    overflow: 'hidden',
+    borderRadius: '15px', // Bordas arredondadas mais elegantes
+    marginBottom: '20px',
+    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.15)', // Sombra suave ao redor do container
+    border: '5px solid #F4C8A1', // Borda fina e sutil
   },
   image: {
-    width: '100%',
-    borderRadius: '5px',
+    width: '40%',
+    height: 'auto',
+    borderRadius: '10px', // Bordas arredondadas para a imagem
+    objectFit: 'cover', // Cobre o container mantendo a proporção da imagem
   },
   editButton: {
-    display: 'block', // Alinha o botão como um bloco
-    margin: '10px auto', // Centraliza o botão
-    padding: '10px 20px', // Adiciona preenchimento
-    backgroundColor: '#8B4513', // Cor de fundo burlywood
-    color: '#fff', // Cor do texto
-    border: 'none', // Remove borda
-    borderRadius: '5px', // Bordas arredondadas
-    cursor: 'pointer', // Muda o cursor para ponteiro
-  },
-  favoritosContainer: {
-    marginTop: '20px',
-    padding: '10px',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '5px',
-    border: '1px solid #ccc',
-  },
-  favoritoButton: {
-    background: 'none',
+    backgroundColor: '#FFA07A',
     border: 'none',
+    borderRadius: '25px',
     cursor: 'pointer',
-    marginLeft: '10px',
+    width: '120px',
+    height: '45px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+    transition: 'all 0.3s ease',
   },
   deleteButton: {
-    backgroundColor: 'red',
-    color: 'white',
+    backgroundColor: '#FF6347',
     border: 'none',
-    borderRadius: '4px',
-    padding: '5px 10px',
+    borderRadius: '25px',
     cursor: 'pointer',
-    marginLeft: '10px',
+    width: '120px',
+    height: '45px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+    transition: 'all 0.3s ease',
   },
-
-
+  favoritosContainer: {
+    marginTop: '25px',
+    backgroundColor: '#FFF8DC',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+  },
+  comentariosContainer: {
+    marginTop: '20px',
+  },
+  comentarioInput: {
+    marginTop: '15px',
+    width: '100%',
+    padding: '12px',
+    backgroundColor: '#F5DEB3',
+    borderRadius: '15px', // Mais arredondado
+    border: '1px solid #ccc',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    fontSize: '16px',
+  },
+  input: {
+    padding: '12px',
+    width: '300px',
+    borderRadius: '15px',
+    border: '1px solid #ccc',
+    marginRight: '15px',
+    fontSize: '16px',
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)', // Sombra suave
+  },
+  successMessage: {
+    marginTop: '25px',
+    color: '#4CAF50',
+    fontSize: '20px', // Aumentando o tamanho da mensagem
+    fontWeight: 'bold',
+    textAlign: 'center', // Centralizando a mensagem de sucesso
+    letterSpacing: '1px', // Espaçamento das letras
+    textShadow: '1px 1px 3px rgba(0, 0, 0, 0.1)',
+  },
 };
 
 export default CasaraoListPage;
