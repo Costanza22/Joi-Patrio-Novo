@@ -136,7 +136,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
           {image && (
           <div>
             <img
-              src={`http://localhost:5000/casaroes/${image}`}
+              src={`https://meu-backend-azure.azurewebsites.net/casaroes/${image}`}
               alt={name}
               style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
             />

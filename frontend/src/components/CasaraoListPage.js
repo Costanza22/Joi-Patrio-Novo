@@ -402,14 +402,11 @@ const styles = {
     marginTop: '20px',
   },
   comentarioInput: {
-    marginTop: '15px',
     width: '100%',
-    padding: '12px',
-    backgroundColor: '#F5DEB3',
-    borderRadius: '15px', // Mais arredondado
+    padding: '10px',
+    marginTop: '10px',
     border: '1px solid #ccc',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-    fontSize: '16px',
+    borderRadius: '5px',
   },
   input: {
     padding: '12px',
@@ -428,6 +425,13 @@ const styles = {
     textAlign: 'center', // Centralizando a mensagem de sucesso
     letterSpacing: '1px', // Espaçamento das letras
     textShadow: '1px 1px 3px rgba(0, 0, 0, 0.1)',
+    filterInput: {
+      padding: '8px',
+      width: '100%',
+      marginBottom: '10px',
+      border: '1px solid #ccc',
+      borderRadius: '5px',
+    },
   },
 };
 

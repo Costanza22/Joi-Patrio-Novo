@@ -145,12 +145,16 @@ function LoginPage({ onLogin, showCasaroes }) {
   const handleLogin = () => {
     if (role === 'admin' && username === 'admin' && password === 'admin') {
       onLogin(true);
-
-      showCasaroes(); 
+      showCasaroes();
+    } else if (role === 'visitante' && username !== '' && password !== '') {
+      // Considerando que o visitante só precisa de um nome de usuário e senha qualquer
+      onLogin(true);
+      showCasaroes();
     } else {
       alert('Credenciais inválidas.');
     }
   };
+  
 
   const handleRegister = () => {
     if (password === confirmPassword) {

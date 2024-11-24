@@ -1,3 +1,4 @@
+
 import express from 'express';
 import mysql from 'mysql2';
 import multer from 'multer';
@@ -145,6 +146,7 @@ app.delete('/casaroes/:id', (req, res) => {
 });
 
 // Inicia o servidor
-app.listen(5000, () => {
-  console.log('Servidor rodando');
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta ${port}`);
 });
