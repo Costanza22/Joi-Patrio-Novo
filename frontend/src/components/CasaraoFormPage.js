@@ -136,7 +136,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
           {image && (
           <div>
             <img
-              src={`https://meu-backend-azure.azurewebsites.net/casaroes/${image}`}
+              src={`/casaroes/${image}`}
               alt={name}
               style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
             />
@@ -182,7 +182,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
 const styles = {
   container: {
     padding: '20px',
-    backgroundColor: '#f5f5dc', // Paleta mais suave
+    backgroundColor: '#f5f5dc', 
     fontFamily: "'Poppins', sans-serif",
     borderRadius: '10px',
     maxWidth: '500px',

@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "Parte Dois do projeto **Joi Patrio**, este repositório contém o código separado para o login do administrador e visitante, bem como a página para cadastrar casarões, tudo conectado a um banco de dados MySQL.",
   "main": "index.js",
-  "type":"module",
+  "type": "module",
   "engines": {
-    "node":"18.x"
+    "node": "18.x"
   },
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests defined yet\""
   },
   "keywords": [],
   "author": "",

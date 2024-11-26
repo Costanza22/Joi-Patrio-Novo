@@ -19,7 +19,7 @@ function CasaraoListPage({ isAdmin }) {
   const [successMessage, setSuccessMessage] = useState(''); 
   const fetchCasaroes = async () => {
     try {
-      const response = await fetch('http://localhost:5000/casaroes');
+      const response = await fetch(`https://backend-joi.vercel.app/casaroes`);
       if (!response.ok) throw new Error('Erro ao carregar os casarões: ' + response.statusText);
 
       
@@ -94,7 +94,7 @@ function CasaraoListPage({ isAdmin }) {
   if (!window.confirm('Tem certeza que deseja excluir este casarão?')) return;
 
   try {
-    const response = await fetch(`http://localhost:5000/casaroes/${casaraoId}`, {
+    const response = await fetch(`https://backend-joi.vercel.app/casaroes/${casaraoId}`, {
       method: 'DELETE',
     });
 
@@ -111,8 +111,8 @@ function CasaraoListPage({ isAdmin }) {
     try {
       const method = casaraoToEdit?.id ? 'PUT' : 'POST';
       const url = casaraoToEdit?.id 
-        ? `http://localhost:5000/casaroes/${casaraoToEdit.id}`
-        : 'http://localhost:5000/casaroes';
+        ? `https://backend-joi.vercel.app/casaroes/${casaraoToEdit.id}`
+        : `https://backend-joi.vercel.app/casaroes`;
       const response = await fetch(url, {
         method,
         body: novoCasarao,
@@ -201,7 +201,7 @@ function CasaraoListPage({ isAdmin }) {
                       {casarao.image_path && (
   <div style={styles.imageContainer}>
     <img
-      src={`http://localhost:5000/${casarao.image_path}`}
+      src={`https://backend-joi.vercel.app/${casarao.image_path}`}
       alt={casarao.name}
       onError={(e) => {
         console.error('Erro ao carregar a imagem:', e);
@@ -302,41 +302,41 @@ function CasaraoListPage({ isAdmin }) {
 const styles = {
   container: {
     padding: '30px',
-    backgroundColor: '#F9F3E3', // Cor mais suave
+    backgroundColor: '#F9F3E3', 
     fontFamily: 'Georgia, serif',
-    borderRadius: '15px', // Bordas mais arredondadas
-    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)', // Sombra mais intensa
-    transition: 'box-shadow 0.3s ease', // Efeito suave ao passar o mouse
+    borderRadius: '15px', 
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)', 
+    transition: 'box-shadow 0.3s ease', 
   },
   title: {
-    fontSize: '40px', // Tamanho maior para dar mais impacto
-    color: '#4B2A14', // Cor de destaque mais profunda
+    fontSize: '40px',
+    color: '#4B2A14', 
     textAlign: 'center',
     marginBottom: '25px',
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    letterSpacing: '4px', // Mais espaçamento para elegância
-    textShadow: '2px 2px 5px rgba(0, 0, 0, 0.15)', // Sombra de texto para destaque
+    letterSpacing: '4px',
+    textShadow: '2px 2px 5px rgba(0, 0, 0, 0.15)', 
   },
   button: {
     display: 'block',
     margin: '15px auto',
     padding: '12px 25px',
-    backgroundColor: '#8B4513', // Cor mais vibrante
+    backgroundColor: '#8B4513', 
     color: '#fff',
     border: 'none',
-    borderRadius: '30px', // Bordas mais arredondadas
+    borderRadius: '30px', 
     cursor: 'pointer',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', // Sombra sutil
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)', 
     transition: 'all 0.3s ease',
   },
   buttonHover: {
-    backgroundColor: '#6A2E12', // Cor do botão ao passar o mouse
-    transform: 'scale(1.05)', // Efeito de ampliação suave
+    backgroundColor: '#6A2E12', 
+    transform: 'scale(1.05)', 
   },
   listContainer: {
     backgroundColor: '#FFF8DC', 
-    padding: '20px', // Mais espaçamento
+    padding: '20px', 
     borderRadius: '10px',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
     transition: 'box-shadow 0.3s ease',
@@ -360,16 +360,16 @@ const styles = {
   
   imageContainer: {
     overflow: 'hidden',
-    borderRadius: '15px', // Bordas arredondadas mais elegantes
+    borderRadius: '15px', 
     marginBottom: '20px',
-    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.15)', // Sombra suave ao redor do container
-    border: '5px solid #F4C8A1', // Borda fina e sutil
+    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.15)', 
+    border: '5px solid #F4C8A1', 
   },
   image: {
     width: '40%',
     height: 'auto',
-    borderRadius: '10px', // Bordas arredondadas para a imagem
-    objectFit: 'cover', // Cobre o container mantendo a proporção da imagem
+    borderRadius: '10px', 
+    objectFit: 'cover', 
   },
   editButton: {
     backgroundColor: '#FFA07A',
@@ -415,15 +415,15 @@ const styles = {
     border: '1px solid #ccc',
     marginRight: '15px',
     fontSize: '16px',
-    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)', // Sombra suave
+    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)', 
   },
   successMessage: {
     marginTop: '25px',
     color: '#4CAF50',
-    fontSize: '20px', // Aumentando o tamanho da mensagem
+    fontSize: '20px', 
     fontWeight: 'bold',
-    textAlign: 'center', // Centralizando a mensagem de sucesso
-    letterSpacing: '1px', // Espaçamento das letras
+    textAlign: 'center', 
+    letterSpacing: '1px',
     textShadow: '1px 1px 3px rgba(0, 0, 0, 0.1)',
     filterInput: {
       padding: '8px',
