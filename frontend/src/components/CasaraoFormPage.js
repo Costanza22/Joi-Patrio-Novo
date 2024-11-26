@@ -10,6 +10,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [constructionDate, setConstructionDate] = useState('');
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
   const [loadingMap, setLoadingMap] = useState(false); // State for loading map
+  const [base64, setBase64] = useState("");
 
   useEffect(() => {
     if (casaraoData) {
@@ -55,31 +56,42 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]; // Get the uploaded file
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result.split(",")[1]; // Remove the data type prefix
+        setBase64(base64String); // Save Base64 string in state
+      };
+      reader.readAsDataURL(file); // Read the file as a Data URL
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('description', description);
-    formData.append('location', location);
-    formData.append('cep', cep);
-    formData.append('image', image);
-    formData.append('date', constructionDate);
-    formData.append('latitude', coordinates.lat);
-    formData.append('longitude', coordinates.lng);
+    let data = {
+      name,
+      description,
+      location,
+      cep,
+      latitude: coordinates.lat,
+      longitude: coordinates.lng
+    }
 
     if (constructionDate) {
       const formattedDate = new Date(constructionDate).toISOString().split('T')[0];
-      formData.append('constructionDate', formattedDate);
+      data.constructionDate = formattedDate;
     } else {
-      formData.append('constructionDate', '');
+      data.constructionDate = '';
     }
 
     if (casaraoData?.id) {
-      formData.append('id', casaraoData.id);
+      data.id = casaraoData.id;
     }
 
-    onSubmit(formData);
+    onSubmit({formData: data, base64});
 
     // Reset form after submit
     setName('');
@@ -149,7 +161,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
         <input
           type="file"
           id="fileInput"
-          onChange={(e) => setImage(e.target.files[0])}
+          onChange={handleFileChange}
           style={styles.fileInput}
         />
 

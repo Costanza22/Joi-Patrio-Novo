@@ -107,16 +107,21 @@ function CasaraoListPage({ isAdmin }) {
   }
 };
 
-  const handleCasaraoSubmit = async (novoCasarao) => {
+  const handleCasaraoSubmit = async ({formData, base64}) => {
+
+    console.log({formData, base64});
     try {
       const method = casaraoToEdit?.id ? 'PUT' : 'POST';
       const url = casaraoToEdit?.id 
         ? `https://backend-joi.vercel.app/casaroes/${casaraoToEdit.id}`
         : `https://backend-joi.vercel.app/casaroes`;
-      const response = await fetch(url, {
-        method,
-        body: novoCasarao,
-      });
+        const response = await fetch(url, {
+          method: method, // Verifique se 'method' é uma string válida como 'POST' ou 'GET'
+          headers: {
+            "Content-Type": "application/json", // Certifique-se de que o Content-Type esteja correto
+          },
+          body: JSON.stringify({ formData, base64 }), // Verifique se 'formData' e 'base64' são dados válidos
+        });        
       
       if (!response.ok) throw new Error(`Erro ao salvar o casarão: ${response.statusText}`);
       
@@ -201,7 +206,7 @@ function CasaraoListPage({ isAdmin }) {
                       {casarao.image_path && (
   <div style={styles.imageContainer}>
     <img
-      src={`https://backend-joi.vercel.app/${casarao.image_path}`}
+      src={`data:image/jpeg;base64,${casarao.image_path}`}
       alt={casarao.name}
       onError={(e) => {
         console.error('Erro ao carregar a imagem:', e);

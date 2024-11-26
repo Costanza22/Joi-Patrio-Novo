@@ -45,10 +45,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post('/casaroes', upload.single('image'), (req, res) => {
-  console.log('Dados recebidos:', req.body);  // Verifica se `date` está presente no corpo da requisição
-  const { name, description, location, cep, date } = req.body; 
-  const image_path = req.file ? req.file.path : null;
+app.post('/casaroes', (req, res) => { // Verifica se `date` está presente no corpo da requisição
+  const {formData, base64}= req.body;
+  const { name, description, location, cep, date } = formData; 
+
+  const image_path = base64;
 
   const sql = 'INSERT INTO casaroes (name, description, location, cep, image_path, date) VALUES (?, ?, ?, ?, ?, ?)';
   db.query(sql, [name, description, location, cep, image_path, date || null], (err, results) => {
@@ -75,10 +76,12 @@ app.get('/casaroes', (req, res) => {
 
 
 // Rota para editar um casarão pelo ID, atualizando apenas os campos fornecidos
-app.put('/casaroes/:id', upload.single('image'), (req, res) => {
+app.put('/casaroes/:id', (req, res) => {
   const { id } = req.params;
-  const { name, description, location, cep, date } = req.body;
-  const image_path = req.file ? req.file.path : null;
+  const {formData, base64}= req.body;
+  const { name, description, location, cep, date } = formData;
+
+  const image_path = base64;
 
   // Cria uma consulta dinâmica com os campos que foram enviados
   let sql = 'UPDATE casaroes SET ';
