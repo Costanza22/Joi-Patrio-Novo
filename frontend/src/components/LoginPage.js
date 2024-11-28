@@ -148,7 +148,7 @@ function LoginPage({ onLogin, showCasaroes }) {
       showCasaroes();
     } else if (role === 'visitante' && username !== '' && password !== '') {
       // Considerando que o visitante só precisa de um nome de usuário e senha qualquer
-      onLogin(true);
+      onLogin(false);
       showCasaroes();
     } else {
       alert('Credenciais inválidas.');
