@@ -1,235 +1,369 @@
-import express from 'express';
-import mysql from 'mysql2';
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import cors from 'cors';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import React, { useState } from 'react';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-const app = express();
-const SECRET = 'sua_chave_secreta_muito_segura';
-
-// Simplificando a configuração CORS
-app.use(cors());  // Permite todas as origens durante desenvolvimento
-
-app.use(express.json({limit: '10mb'}));
-app.use(express.urlencoded({limit: '10mb', extended: true}));
-
-// Servir arquivos estáticos da pasta 'uploads'
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-
-// Conexão ao banco de dados MySQL
-const db = mysql.createConnection({
-  host: "joipatrio.mysql.database.azure.com",  
-  user: "costanza22",               
-  password: "Nikita22!",                    
-  database: "joipatrio"                       
-});
-
-db.connect((err) => {
-  if (err) {
-    console.error('Erro ao conectar ao MySQL:', err);
-    return;
-  }
-  console.log('Conectado ao MySQL');
-});
-
-// Configuração do multer para salvar imagens em disco
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = 'uploads/';
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
-    }
-    cb(null, uploadDir);
+const commonStyles = {
+  colorBrown: '#8B4513',
+  borderRadius: '5px',
+  fullWidth: {
+    width: '100%',
   },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
+};
 
-const upload = multer({ storage });
+const styles = {
+  container: {
+    display: 'flex',
+    height: '100vh',
+    fontFamily: 'Georgia, serif',
+  },
+  imageContainer: {
+    flex: 1,
+    backgroundImage: 'url("https://omunicipiojoinville.com/wp-content/uploads/2023/03/palacete-doria-joinville.jpg")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    borderRight: '2px solid #8B4513', 
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  formContainer: {
+    flex: 1,
+    backgroundColor: '#FFF8DC',
+    padding: '40px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: '28px',
+    color: commonStyles.colorBrown,
+    fontWeight: 'bold',
+    marginBottom: '10px',
+  },
+  subtitle: {
+    fontSize: '16px',
+    color: commonStyles.colorBrown,
+    marginBottom: '20px',
+  },
+  input: {
+    padding: '10px',
+    marginBottom: '15px',
+    ...commonStyles.fullWidth,
+    borderRadius: commonStyles.borderRadius,
+    border: `1px solid ${commonStyles.colorBrown}`,
+    color: commonStyles.colorBrown,
+    boxSizing: 'border-box',
+  },
+  passwordContainer: {
+    position: 'relative',
+    ...commonStyles.fullWidth,
+    marginBottom: '10px',
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: '10px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    cursor: 'pointer',
+    color: commonStyles.colorBrown,
+  },
+  button: {
+    padding: '12px',
+    backgroundColor: commonStyles.colorBrown,
+    color: '#fff',
+    border: 'none',
+    borderRadius: commonStyles.borderRadius,
+    cursor: 'pointer',
+    ...commonStyles.fullWidth,
+    marginTop: '15px',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s ease',
+  },
+  buttonHover: {
+    backgroundColor: '#A0522D', 
+  },
+  switchText: {
+    marginTop: '15px',
+    fontSize: '14px',
+    color: commonStyles.colorBrown,
+  },
+  linkButton: {
+    padding: '12px 20px',
+    backgroundColor: 'burlywood',
+    color: '#fff',
+    border: 'none',
+    borderRadius: commonStyles.borderRadius,
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s ease',
+    textAlign: 'center',
+    textDecoration: 'none',
+  },
+  linkButtonHover: {
+    backgroundColor: '#D2B48C', 
+  },
+  select: {
+    padding: '12px',
+    marginBottom: '20px',
+    ...commonStyles.fullWidth,
+    borderRadius: commonStyles.borderRadius,
+    border: `1px solid ${commonStyles.colorBrown}`,
+    color: commonStyles.colorBrown,
+    fontSize: '16px',
+    fontWeight: 'bold',
+    backgroundColor: 'burlywood', 
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
+  },
+  selectHover: {
+    backgroundColor: '#F4A460', 
+  },
+  registerButton: {
+    padding: '12px',
+    backgroundColor: '#D2B48C',
+    color: '#fff',
+    border: 'none',
+    borderRadius: commonStyles.borderRadius,
+    cursor: 'pointer',
+    ...commonStyles.fullWidth,
+    marginTop: '15px',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s ease',
+  },
+  registerButtonHover: {
+    backgroundColor: '#D2B48C', 
+  },
+};
 
-app.post('/casaroes', (req, res) => { // Verifica se `date` está presente no corpo da requisição
-  const {formData, base64}= req.body;
-  const { name, description, location, cep, date } = formData; 
-
-  const image_path = base64;
-
-  const sql = 'INSERT INTO casaroes (name, description, location, cep, image_path, date) VALUES (?, ?, ?, ?, ?, ?)';
-  db.query(sql, [name, description, location, cep, image_path, date || null], (err, results) => {
-    if (err) {
-      console.error('Erro ao cadastrar o casarão:', err);
-      return res.status(500).json({ error: 'Erro ao cadastrar o casarão' });
-    }
-    res.status(201).json({ id: results.insertId, name, description, location, cep, image_path, date });
-  });
-});
-
-app.get("/test", (req, res) => {
-  res.json({success: true})
-})
-
-
-// Rota para consultar todos os casarões
-app.get('/casaroes', (req, res) => {
-  const sql = 'SELECT id, name, description, location, image_path, date FROM casaroes';
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error('Erro ao consultar casarões:', err);
-      return res.status(500).json({ error: 'Erro ao consultar casarões' });
-    }
-    res.json(results);
-  });
-});
-
-
-// Rota para editar um casarão pelo ID, atualizando apenas os campos fornecidos
-app.put('/casaroes/:id', (req, res) => {
-  const { id } = req.params;
-  const {formData, base64}= req.body;
-  const { name, description, location, cep, date } = formData;
-
-  const image_path = base64;
-
-  // Cria uma consulta dinâmica com os campos que foram enviados
-  let sql = 'UPDATE casaroes SET ';
-  const values = [];
-  
-  if (name) {
-    sql += 'name = ?, ';
-    values.push(name);
-  }
-  if (description) {
-    sql += 'description = ?, ';
-    values.push(description);
-  }
-  if (location) {
-    sql += 'location = ?, ';
-    values.push(location);
-  }
-  if (cep) {
-    sql += 'cep = ?, ';
-    values.push(cep);
-  }
-  if (date) {
-    sql += 'date = ?, ';
-    values.push(date);
-  }
-  if (image_path) {
-    sql += 'image_path = ?, ';
-    values.push(image_path);
-  }
-  
-  sql = sql.slice(0, -2) + ' WHERE id = ?';
-  values.push(id);
-
-  db.query(sql, values, (err, results) => {
-    if (err) {
-      console.error('Erro ao atualizar o casarão:', err);
-      return res.status(500).json({ error: 'Erro ao atualizar o casarão' });
-    }
-    
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ error: 'Casarão não encontrado' });
-    }
-
-    res.status(200).json({ message: 'Casarão atualizado com sucesso' });
-  });
-});
-
-// Rota para excluir um casarão pelo ID
-app.delete('/casaroes/:id', (req, res) => {
-  const { id } = req.params;
-  const sql = 'DELETE FROM casaroes WHERE id = ?';
-
-  db.query(sql, [id], (err, results) => {
-    if (err) {
-      console.error('Erro ao excluir o casarão:', err);
-      return res.status(500).json({ error: 'Erro ao excluir o casarão' });
-    }
-    
-    if (results.affectedRows === 0) {
-      return res.status(404).json({ error: 'Casarão não encontrado' });
-    }
-
-    res.status(200).json({ message: 'Casarão excluído com sucesso' });
-  });
-});
-
-// Rota para cadastro
-app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).send({ message: 'Usuário e senha são obrigatórios!' });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const sql = 'INSERT INTO users (username, password) VALUES (?, ?)';
-  db.query(sql, [username, hashedPassword], (err, result) => {
-    if (err) return res.status(500).send({ message: 'Erro no servidor!' });
-    res.status(201).send({ message: 'Usuário cadastrado com sucesso!' });
-  });
-});
-// Rota para login
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
-  }
-
-  try {
-    // Buscar usuário no banco de dados
-    const sql = 'SELECT * FROM users WHERE username = ?';
-    db.query(sql, [username], async (err, results) => {
-      if (err) {
-        console.error('Erro ao buscar usuário:', err);
-        return res.status(500).json({ message: 'Erro no servidor!' });
-      }
-
-      if (results.length === 0) {
-        return res.status(401).json({ message: 'Usuário não encontrado!' });
-      }
-
-      const user = results[0];
-
-      // Verificar senha
-      const senhaCorreta = await bcrypt.compare(password, user.password);
-      if (!senhaCorreta) {
-        return res.status(401).json({ message: 'Senha incorreta!' });
-      }
-
-      // Gerar token JWT
-      const token = jwt.sign(
-        { 
-          id: user.id, 
-          username: user.username,
-          role: req.body.role // Incluindo a role no token
+function LoginPage({ onLogin, showCasaroes }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const handleLogin = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/login`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        SECRET,
-        { expiresIn: '24h' }
-      );
-
-      // Enviar resposta de sucesso
-      res.json({
-        message: 'Login realizado com sucesso!',
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-          role: req.body.role
-        }
+        credentials: 'include',
+        body: JSON.stringify({ username, password, role }),
       });
-    });
-  } catch (error) {
-    console.error('Erro no login:', error);
-    res.status(500).json({ message: 'Erro no servidor!' });
-  }
-});
+  
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        localStorage.setItem('token', data.token);
+        onLogin(role === 'admin');
+        showCasaroes();
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      alert('Erro ao fazer login. Tente novamente!');
+    }
+  };
+  
+
+  const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      return alert('As senhas não coincidem!');
+    }
+    try {
+      const response = await fetch(`http://localhost:5000/register`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username, password, role }),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        setIsRegistering(false);
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar:', error);
+      alert('Erro ao cadastrar. Tente novamente!');
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.imageContainer}>
+        {/* Imagem à esquerda da tela */}
+      </div>
+      <div style={styles.formContainer}>
+        {isRegistering ? (
+          <RegisterForm
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+            handleRegister={handleRegister}
+            setIsRegistering={setIsRegistering}
+          />
+        ) : (
+          <LoginForm
+            role={role}
+            setRole={setRole}
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+            handleLogin={handleLogin}
+            setIsRegistering={setIsRegistering}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RegisterForm({
+  username,
+  setUsername,
+  password,
+  setPassword,
+  confirmPassword,
+  setConfirmPassword,
+  showPassword,
+  setShowPassword,
+  handleRegister,
+  setIsRegistering,
+}) {
+  return (
+    <>
+      <h2 style={styles.title}>Cadastro</h2>
+      <input
+        type="text"
+        placeholder="Nome de Usuário"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        style={styles.input}
+      />
+      <PasswordField
+        password={password}
+        setPassword={setPassword}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
+      />
+      <input
+        type="password"
+        placeholder="Confirme a Senha"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        style={styles.input}
+      />
+      <button onClick={handleRegister} style={styles.registerButton}>
+        Cadastrar-se
+      </button>
+      <p style={styles.switchText}>
+        Já tem uma conta?{' '}
+        <button
+          onClick={() => setIsRegistering(false)}
+          style={{ ...styles.linkButton, ...styles.linkButtonHover }}
+        >
+          Entrar
+        </button>
+      </p>
+    </>
+  );
+}
+
+function LoginForm({
+  role,
+  setRole,
+  username,
+  setUsername,
+  password,
+  setPassword,
+  showPassword,
+  setShowPassword,
+  handleLogin,
+  setIsRegistering,
+}) {
+  return (
+    <>
+      <h2 style={styles.title}>Bem-vindo ao JoiPatrio</h2>
+      <p style={styles.subtitle}>
+        {role === 'visitante' ? 'Consultar Casarões' : 'Escolha sua função para acessar'}
+      </p>
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value)}
+        style={styles.select}
+        onMouseEnter={(e) => (e.target.style.backgroundColor = '#F4A460')} // Hover efeito no select
+        onMouseLeave={(e) => (e.target.style.backgroundColor = 'burlywood')}
+      >
+        <option value="">Selecione uma função</option>
+        <option value="admin">Administrador</option>
+        <option value="visitante">Visitante</option>
+      </select>
+      <input
+        type="text"
+        placeholder="Nome de Usuário"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        style={styles.input}
+      />
+      <PasswordField
+        password={password}
+        setPassword={setPassword}
+        showPassword={showPassword}
+        setShowPassword={setShowPassword}
+      />
+      <button onClick={handleLogin} style={styles.button}>
+        Entrar
+      </button>
+      <p style={styles.switchText}>
+        Não tem uma conta?{' '}
+        <button
+          onClick={() => setIsRegistering(true)}
+          style={{ ...styles.linkButton, ...styles.linkButtonHover }}
+        >
+          Cadastrar-se
+        </button>
+      </p>
+    </>
+  );
+}
+
+function PasswordField({ password, setPassword, showPassword, setShowPassword }) {
+  return (
+    <div style={styles.passwordContainer}>
+      <input
+        type={showPassword ? 'text' : 'password'}
+        placeholder="Senha"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        style={styles.input}
+      />
+      <div style={styles.eyeIcon} onClick={() => setShowPassword(!showPassword)}>
+        {showPassword ? <FaEye /> : <FaEyeSlash />}
+      </div>
+    </div>
+  );
+}
+
+export default LoginPage;
 
 
 // Inicia o servidor
