@@ -19,7 +19,8 @@ function CasaraoListPage({ isAdmin }) {
   const [successMessage, setSuccessMessage] = useState(''); 
   const fetchCasaroes = async () => {
     try {
-      const response = await fetch(`/casaroes`);
+      const response = await fetch(`https://back-production-8285.up.railway.app/casaroes`);
+
       if (!response.ok) throw new Error('Erro ao carregar os casarões: ' + response.statusText);
 
       
@@ -94,7 +95,7 @@ function CasaraoListPage({ isAdmin }) {
   if (!window.confirm('Tem certeza que deseja excluir este casarão?')) return;
 
   try {
-    const response = await fetch(`/casaroes/${casaraoId}`, {
+    const response = await fetch(`https://back-production-8285.up.railway.app/casaroes/${casaraoId}`, {
       method: 'DELETE',
     });
 
@@ -113,14 +114,14 @@ function CasaraoListPage({ isAdmin }) {
     try {
       const method = casaraoToEdit?.id ? 'PUT' : 'POST';
       const url = casaraoToEdit?.id 
-        ? `/casaroes/${casaraoToEdit.id}`
-        : `/casaroes`;
+        ? `https://back-production-8285.up.railway.app/casaroes/${casaraoToEdit.id}`
+        : `https://back-production-8285.up.railway.app/casaroes`;
         const response = await fetch(url, {
-          method: method, 
+          method: method, // Verifique se 'method' é uma string válida como 'POST' ou 'GET'
           headers: {
-            "Content-Type": "application/json", 
+            "Content-Type": "application/json", // Certifique-se de que o Content-Type esteja correto
           },
-          body: JSON.stringify({ formData, base64 }), 
+          body: JSON.stringify({ formData, base64 }), // Verifique se 'formData' e 'base64' são dados válidos
         });        
       
       if (!response.ok) throw new Error(`Erro ao salvar o casarão: ${response.statusText}`);
