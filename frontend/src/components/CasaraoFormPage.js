@@ -100,6 +100,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     setCep('');
     setConstructionDate('');
     setImage(null);
+    setBase64("");
     setCoordinates({ lat: null, lng: null });
   };
 
@@ -145,18 +146,18 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
           onChange={(e) => setConstructionDate(e.target.value)}
           style={styles.input}
         />
-          {image && (
+          {base64 && (
           <div>
             <img
-              src={`/casaroes/${image}`}
+              src={`data:image/jpeg;base64,${base64}`}
               alt={name}
               style={{ width: '100%', height: 'auto', marginBottom: '10px' }}
             />
-            <p>Imagem atual: {image.name}</p>
+            <p>Imagem atual</p>
           </div>
         )}
         <label htmlFor="fileInput" style={styles.fileLabel}>
-          {image ? image.name : 'Escolher arquivo'}
+          Escolher arquivo
         </label>
         <input
           type="file"

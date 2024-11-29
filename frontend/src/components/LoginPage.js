@@ -142,26 +142,77 @@ function LoginPage({ onLogin, showCasaroes }) {
   const [isRegistering, setIsRegistering] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleLogin = () => {
-    if (role === 'admin' && username === 'admin' && password === 'admin') {
-      onLogin(true);
-      showCasaroes();
-    } else if (role === 'visitante' && username !== '' && password !== '') {
-      // Considerando que o visitante só precisa de um nome de usuário e senha qualquer
-      onLogin(true);
-      showCasaroes();
-    } else {
-      alert('Credenciais inválidas.');
+  const handleLogin = async () => {
+    // Validação dos campos
+    if (!username || !password || !role) {
+      alert('Por favor, preencha todos os campos!');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/login`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          username, 
+          password 
+        }),
+      });
+  
+      const data = await response.json();
+      
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', role); 
+        localStorage.setItem('username', username); 
+        alert('Login realizado com sucesso!');
+        onLogin(role === 'admin'); 
+      } else {
+        alert(data.message || 'Erro ao fazer login!');
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      alert('Erro ao fazer login. Tente novamente!');
     }
   };
-  
 
-  const handleRegister = () => {
-    if (password === confirmPassword) {
-      alert('Cadastro realizado com sucesso!');
-      setIsRegistering(false); 
-    } else {
+  const handleRegister = async () => {
+    // Validação dos campos
+    if (!username || !password || !confirmPassword) {
+      alert('Por favor, preencha todos os campos!');
+      return;
+    }
+
+    if (password !== confirmPassword) {
       alert('As senhas não coincidem!');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/register`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password }),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message);
+        setIsRegistering(false); 
+        // Limpa os campos
+        setUsername('');
+        setPassword('');
+        setConfirmPassword('');
+      } else {
+        alert(data.message || 'Erro ao cadastrar!');
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar:', error);
+      alert('Erro ao cadastrar. Tente novamente!');
     }
   };
 

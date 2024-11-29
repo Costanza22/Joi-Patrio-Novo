@@ -1,15 +1,20 @@
-
 import express from 'express';
 import mysql from 'mysql2';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app = express();
+const SECRET = 'sua_chave_secreta_muito_segura';
+
+// Simplificando a configuração CORS
+app.use(cors());  // Permite todas as origens durante desenvolvimento
+
 app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({limit: '10mb', extended: true}));
-app.use(cors());
 
 // Servir arquivos estáticos da pasta 'uploads'
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
@@ -61,6 +66,10 @@ app.post('/casaroes', (req, res) => { // Verifica se `date` está presente no co
     res.status(201).json({ id: results.insertId, name, description, location, cep, image_path, date });
   });
 });
+
+app.get("/test", (req, res) => {
+  res.json({success: true})
+})
 
 
 // Rota para consultar todos os casarões
@@ -148,6 +157,80 @@ app.delete('/casaroes/:id', (req, res) => {
     res.status(200).json({ message: 'Casarão excluído com sucesso' });
   });
 });
+
+// Rota para cadastro
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).send({ message: 'Usuário e senha são obrigatórios!' });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const sql = 'INSERT INTO users (username, password) VALUES (?, ?)';
+  db.query(sql, [username, hashedPassword], (err, result) => {
+    if (err) return res.status(500).send({ message: 'Erro no servidor!' });
+    res.status(201).send({ message: 'Usuário cadastrado com sucesso!' });
+  });
+});
+// Rota para login
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
+  }
+
+  try {
+    // Buscar usuário no banco de dados
+    const sql = 'SELECT * FROM users WHERE username = ?';
+    db.query(sql, [username], async (err, results) => {
+      if (err) {
+        console.error('Erro ao buscar usuário:', err);
+        return res.status(500).json({ message: 'Erro no servidor!' });
+      }
+
+      if (results.length === 0) {
+        return res.status(401).json({ message: 'Usuário não encontrado!' });
+      }
+
+      const user = results[0];
+
+      // Verificar senha
+      const senhaCorreta = await bcrypt.compare(password, user.password);
+      if (!senhaCorreta) {
+        return res.status(401).json({ message: 'Senha incorreta!' });
+      }
+
+      // Gerar token JWT
+      const token = jwt.sign(
+        { 
+          id: user.id, 
+          username: user.username,
+          role: req.body.role // Incluindo a role no token
+        },
+        SECRET,
+        { expiresIn: '24h' }
+      );
+
+      // Enviar resposta de sucesso
+      res.json({
+        message: 'Login realizado com sucesso!',
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          role: req.body.role
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Erro no login:', error);
+    res.status(500).json({ message: 'Erro no servidor!' });
+  }
+});
+
 
 // Inicia o servidor
 app.listen(5000, () => {
