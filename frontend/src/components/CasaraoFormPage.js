@@ -6,7 +6,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [cep, setCep] = useState('');
-  const [setImage] = useState(null);
+  const [image,setImage] = useState(null);
   const [constructionDate, setConstructionDate] = useState('');
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
   const [loadingMap, setLoadingMap] = useState(false); // State for loading map
