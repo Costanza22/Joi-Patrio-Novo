@@ -19,7 +19,7 @@ function CasaraoListPage({ isAdmin }) {
   const [successMessage, setSuccessMessage] = useState(''); 
   const fetchCasaroes = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/casaroes`);
+      const response = await fetch(`/casaroes`);
       if (!response.ok) throw new Error('Erro ao carregar os casarões: ' + response.statusText);
 
       
@@ -94,7 +94,7 @@ function CasaraoListPage({ isAdmin }) {
   if (!window.confirm('Tem certeza que deseja excluir este casarão?')) return;
 
   try {
-    const response = await fetch(`http://localhost:5000/casaroes/${casaraoId}`, {
+    const response = await fetch(`/casaroes/${casaraoId}`, {
       method: 'DELETE',
     });
 
@@ -113,14 +113,14 @@ function CasaraoListPage({ isAdmin }) {
     try {
       const method = casaraoToEdit?.id ? 'PUT' : 'POST';
       const url = casaraoToEdit?.id 
-        ? `http://localhost:5000/casaroes/${casaraoToEdit.id}`
-        : `http://localhost:5000/casaroes`;
+        ? `/casaroes/${casaraoToEdit.id}`
+        : `/casaroes`;
         const response = await fetch(url, {
-          method: method, // Verifique se 'method' é uma string válida como 'POST' ou 'GET'
+          method: method, 
           headers: {
-            "Content-Type": "application/json", // Certifique-se de que o Content-Type esteja correto
+            "Content-Type": "application/json", 
           },
-          body: JSON.stringify({ formData, base64 }), // Verifique se 'formData' e 'base64' são dados válidos
+          body: JSON.stringify({ formData, base64 }), 
         });        
       
       if (!response.ok) throw new Error(`Erro ao salvar o casarão: ${response.statusText}`);
