@@ -117,11 +117,11 @@ function CasaraoListPage({ isAdmin }) {
         ? `https://back-production-8285.up.railway.app/casaroes/${casaraoToEdit.id}`
         : `https://back-production-8285.up.railway.app/casaroes`;
         const response = await fetch(url, {
-          method: method, // Verifique se 'method' é uma string válida como 'POST' ou 'GET'
+          method: method, 
           headers: {
-            "Content-Type": "application/json", // Certifique-se de que o Content-Type esteja correto
+            "Content-Type": "application/json", 
           },
-          body: JSON.stringify({ formData, base64 }), // Verifique se 'formData' e 'base64' são dados válidos
+          body: JSON.stringify({ formData, base64 }), 
         });        
       
       if (!response.ok) throw new Error(`Erro ao salvar o casarão: ${response.statusText}`);
@@ -201,10 +201,10 @@ function CasaraoListPage({ isAdmin }) {
                       <p>{casarao.description}</p>
                       <p>{casarao.location}</p>
                        <p>Data de Construção: {casarao.date ? 
-                          new Date(casarao.date).toLocaleDateString('pt-BR') : 
-                          'Data não disponível'} 
-                          (Raw: {JSON.stringify(casarao.date)})
-                      </p>
+    new Date(casarao.date).toLocaleDateString('pt-BR') : 
+    'Data não disponível'}
+</p>
+
 
 
 
