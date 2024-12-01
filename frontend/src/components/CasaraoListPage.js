@@ -117,11 +117,11 @@ function CasaraoListPage({ isAdmin }) {
         ? `https://back-production-8285.up.railway.app/casaroes/${casaraoToEdit.id}`
         : `https://back-production-8285.up.railway.app/casaroes`;
         const response = await fetch(url, {
-          method: method, 
+          method: method, // Verifique se 'method' é uma string válida como 'POST' ou 'GET'
           headers: {
-            "Content-Type": "application/json", 
+            "Content-Type": "application/json", // Certifique-se de que o Content-Type esteja correto
           },
-          body: JSON.stringify({ formData, base64 }), 
+          body: JSON.stringify({ formData, base64 }), // Verifique se 'formData' e 'base64' são dados válidos
         });        
       
       if (!response.ok) throw new Error(`Erro ao salvar o casarão: ${response.statusText}`);
@@ -158,30 +158,43 @@ function CasaraoListPage({ isAdmin }) {
       ) : (
         <>
           <h2 style={styles.title}>
-        Lista de Casarões
-        <BsFillPatchQuestionFill onClick={handleIconClick} style={{ cursor: 'pointer', marginLeft: '10px' }} />
-      </h2>
+            Lista de Casarões
+            {!isAdmin && (
+              <BsFillPatchQuestionFill 
+                onClick={handleIconClick} 
+                style={styles.suggestionIcon} 
+                title="Sugerir um casarão"
+              />
+            )}
+          </h2>
 
-      {showInput && (
-        <div style={styles.formContainer}>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={suggestion}
-              onChange={(e) => setSuggestion(e.target.value)}
-              placeholder="Digite sua sugestão"
-              style={styles.input}
-            />
-            <button type="submit" style={styles.button}>
-              Enviar
-            </button>
-          </form>
-        </div>
-      )}
+          {showInput && !isAdmin && (
+            <div style={styles.suggestionContainer}>
+              <h3 style={styles.suggestionTitle}>Sugerir um Casarão</h3>
+              <p style={styles.suggestionText}>
+                Conhece algum casarão histórico que deveria estar em nossa lista? 
+                Compartilhe conosco!
+              </p>
+              <form onSubmit={handleSubmit} style={styles.suggestionForm}>
+                <textarea
+                  value={suggestion}
+                  onChange={(e) => setSuggestion(e.target.value)}
+                  placeholder="Descreva o casarão e sua localização..."
+                  style={styles.suggestionInput}
+                />
+                <button type="submit" style={styles.suggestionButton}>
+                  Enviar Sugestão
+                </button>
+              </form>
+            </div>
+          )}
 
-      {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
-    
-    
+          {successMessage && (
+            <div style={styles.successMessageContainer}>
+              <p style={styles.successMessage}>{successMessage}</p>
+            </div>
+          )}
+          
           <button onClick={handleConsultarClick} style={styles.button}>
             {showList ? 'Fechar Casarões' : 'Consultar Casarões'}
           </button>
@@ -200,11 +213,7 @@ function CasaraoListPage({ isAdmin }) {
                       <h3>{casarao.name}</h3>
                       <p>{casarao.description}</p>
                       <p>{casarao.location}</p>
-                       <p>Data de Construção: {casarao.date ? 
-    new Date(casarao.date).toLocaleDateString('pt-BR') : 
-    'Data não disponível'}
-</p>
-
+                      <p>Data: {casarao.date ? casarao.date.split('T')[0] : 'Data não disponível'}</p>
 
 
 
@@ -442,6 +451,92 @@ const styles = {
       border: '1px solid #ccc',
       borderRadius: '5px',
     },
+  },
+  suggestionIcon: {
+    cursor: 'pointer',
+    marginLeft: '10px',
+    fontSize: '24px',
+    color: '#8B4513',
+    transition: 'transform 0.3s ease',
+    '&:hover': {
+      transform: 'scale(1.1)',
+    }
+  },
+  
+  suggestionContainer: {
+    backgroundColor: '#FFF8DC',
+    padding: '25px',
+    borderRadius: '15px',
+    marginBottom: '30px',
+    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
+    maxWidth: '600px',
+    margin: '0 auto 30px',
+  },
+  
+  suggestionTitle: {
+    color: '#4B2A14',
+    fontSize: '24px',
+    marginBottom: '15px',
+    textAlign: 'center',
+  },
+  
+  suggestionText: {
+    color: '#666',
+    marginBottom: '20px',
+    textAlign: 'center',
+    fontSize: '16px',
+  },
+  
+  suggestionForm: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '15px',
+  },
+  
+  suggestionInput: {
+    padding: '15px',
+    borderRadius: '10px',
+    border: '1px solid #DEB887',
+    minHeight: '100px',
+    fontSize: '16px',
+    resize: 'vertical',
+    backgroundColor: '#FFFFFF',
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#8B4513',
+      boxShadow: '0 0 5px rgba(139, 69, 19, 0.3)',
+    }
+  },
+  
+  suggestionButton: {
+    padding: '12px 25px',
+    backgroundColor: '#8B4513',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '25px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    transition: 'all 0.3s ease',
+    alignSelf: 'center',
+    '&:hover': {
+      backgroundColor: '#6A2E12',
+      transform: 'translateY(-2px)',
+    }
+  },
+  
+  successMessageContainer: {
+    position: 'fixed',
+    top: '20px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    padding: '15px 30px',
+    borderRadius: '25px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    zIndex: 1000,
+    animation: 'fadeOut 3s forwards',
   },
 };
 
