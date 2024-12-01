@@ -200,7 +200,11 @@ function CasaraoListPage({ isAdmin }) {
                       <h3>{casarao.name}</h3>
                       <p>{casarao.description}</p>
                       <p>{casarao.location}</p>
-                      <p>Data: {casarao.date ? casarao.date.split('T')[0] : 'Data não disponível'}</p>
+                       <p>Data de Construção: {casarao.date ? 
+                          new Date(casarao.date).toLocaleDateString('pt-BR') : 
+                          'Data não disponível'} 
+                          (Raw: {JSON.stringify(casarao.date)})
+                      </p>
 
 
 
