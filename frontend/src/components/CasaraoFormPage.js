@@ -7,24 +7,21 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [location, setLocation] = useState('');
   const [cep, setCep] = useState('');
   const [image,setImage] = useState(null);
-  const [constructionDate, setConstructionDate] = useState('');
+  const [date, setDate] = useState('');
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
   const [loadingMap, setLoadingMap] = useState(false); // State for loading map
   const [base64, setBase64] = useState("");
 
-  useEffect(() => {
+ useEffect(() => {
     if (casaraoData) {
       setName(casaraoData.name);
       setDescription(casaraoData.description);
       setLocation(casaraoData.location);
       setCep(casaraoData.cep || '');
       setImage(casaraoData.image_path ? casaraoData.image_path : null);
-      if (casaraoData.constructionDate) {
-        const date = new Date(casaraoData.constructionDate);
-        setConstructionDate(date.toISOString().split('T')[0]);
-      } else {
-        setConstructionDate('');
-      }
+      setDate(casaraoData.date ? 
+        new Date(casaraoData.date).toISOString().split('T')[0] : 
+        '');
     }
   }, [casaraoData]);
 
@@ -76,16 +73,13 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
       description,
       location,
       cep,
+      date: date || null,
       latitude: coordinates.lat,
       longitude: coordinates.lng
     }
 
-    if (constructionDate) {
-      const formattedDate = new Date(constructionDate).toISOString().split('T')[0];
-      data.constructionDate = formattedDate;
-    } else {
-      data.constructionDate = '';
-    }
+    // Log para debug
+    console.log('Dados sendo enviados:', data);
 
     if (casaraoData?.id) {
       data.id = casaraoData.id;
@@ -98,7 +92,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     setDescription('');
     setLocation('');
     setCep('');
-    setConstructionDate('');
+    setDate('');
     setImage(null);
     setBase64("");
     setCoordinates({ lat: null, lng: null });
@@ -142,8 +136,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
         <input
           type="date"
           placeholder="Data de Construção"
-          value={constructionDate}
-          onChange={(e) => setConstructionDate(e.target.value)}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
           style={styles.input}
         />
           {base64 && (
