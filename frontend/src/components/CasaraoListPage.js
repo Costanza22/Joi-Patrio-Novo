@@ -417,6 +417,11 @@ const styles = {
   },
   comentariosContainer: {
     marginTop: '20px',
+    padding: '10px',
+    overflow: 'hidden',
+    borderRadius: '10px',
+    backgroundColor: '#FFF8DC',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
   },
   comentarioInput: {
     width: '100%',
@@ -424,6 +429,7 @@ const styles = {
     marginTop: '10px',
     border: '1px solid #ccc',
     borderRadius: '5px',
+    boxSizing: 'border-box',
   },
   input: {
     padding: '12px',
