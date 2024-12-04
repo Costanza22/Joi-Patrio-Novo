@@ -253,30 +253,28 @@ function CasaraoListPage({ isAdmin }) {
                           <button onClick={() => handleMarcarVisitado(casarao)} style={styles.visitadoButton}>
                             <IoMdCheckmarkCircleOutline style={{ color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray' }} />
                           </button>
+                          
+                          <div style={styles.comentariosContainer}>
+                            <h4>Comentários</h4>
+                            <ul>
+                              {(comentarios[casarao.id] || []).map((comment) => (
+                                <li key={`${casarao.id}-${comment}`}>{comment}</li>
+                              ))}
+                            </ul>
+                            <input
+                              type="text"
+                              placeholder="Adicionar um comentário"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && e.target.value.trim()) {
+                                  handleAddComment(casarao.id, e.target.value);
+                                  e.target.value = '';
+                                }
+                              }}
+                              style={styles.comentarioInput}
+                            />
+                          </div>
                         </>
                       )}
-                      
-                      {/* Seção de Comentários */}
-                      <div style={styles.comentariosContainer}>
-                        <h4>Comentários</h4>
-                        <ul>
-  {(comentarios[casarao.id] || []).map((comment) => (
-    <li key={`${casarao.id}-${comment}`}>{comment}</li>
-  ))}
-</ul>
-
-                        <input
-                          type="text"
-                          placeholder="Adicionar um comentário"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && e.target.value.trim()) {
-                              handleAddComment(casarao.id, e.target.value);
-                              e.target.value = ''; // Limpa o campo de entrada
-                            }
-                          }}
-                          style={styles.comentarioInput}
-                        />
-                      </div>
                     </li>
                   ))}
                 </ul>
