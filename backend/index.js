@@ -149,7 +149,7 @@ app.delete('/casaroes/:id', (req, res) => {
   });
 });
 
-
+export { app };
 
 // Inicia o servidor
 app.listen(5000, () => {
