@@ -22,8 +22,8 @@ jobs:
       - name: Install dependencies
         working-directory: ./backend
         run: |
-          npm ci
-          npm install --save-dev @babel/core @babel/preset-env babel-jest
+          npm install
+          npm install --save-dev @babel/core @babel/preset-env babel-jest supertest
           chmod +x node_modules/.bin/jest
 
       - name: Run tests with coverage
