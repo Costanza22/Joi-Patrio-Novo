@@ -1,4 +1,4 @@
-name: SonarCloud
+name: Build
 on:
   push:
     branches:
@@ -7,27 +7,29 @@ on:
     types: [opened, synchronize, reopened]
 jobs:
   sonarcloud:
-    name: SonarCloud
+    name: SonarQube Cloud
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-          
+
       - name: Install dependencies
         working-directory: ./backend
-        run: npm install
-        
+        run: |
+          npm ci
+          chmod +x node_modules/.bin/jest
+
       - name: Run tests with coverage
         working-directory: ./backend
-        run: npm test -- --coverage --coverageReporters=lcov --coverageReporters=text-summary
-        
-      - name: SonarCloud Scan
+        run: npm test -- --coverage
+
+      - name: SonarQube Cloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
