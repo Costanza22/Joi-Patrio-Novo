@@ -6,8 +6,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [cep, setCep] = useState('');
-  const [image, setImage] = useState(null);
-  const [constructionDate, setConstructionDate] = useState('');
+  const [image,setImage] = useState(null);
+  const [date, setDate] = useState('');
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
   const [loadingMap, setLoadingMap] = useState(false); // State for loading map
   const [base64, setBase64] = useState("");
@@ -19,12 +19,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
       setLocation(casaraoData.location);
       setCep(casaraoData.cep || '');
       setImage(casaraoData.image_path ? casaraoData.image_path : null);
-      if (casaraoData.constructionDate) {
-        const date = new Date(casaraoData.constructionDate);
-        setConstructionDate(date.toISOString().split('T')[0]);
-      } else {
-        setConstructionDate('');
-      }
+      setDate(casaraoData.date || ''); // Simplificado
+    
     }
   }, [casaraoData]);
 
@@ -37,17 +33,21 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
         const data = await response.json();
 
         if (data.localidade) {
-          setLocation(`${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`);
+          const endereco = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+          setLocation(endereco);
 
           // Obter coordenadas usando a API de Geocodificação do Google
           const googleResponse = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${data.logradouro},${data.localidade},${data.uf}&key=YOUR_GOOGLE_API_KEY`
+            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(endereco)}&key=${process.env.REACT_APP_GOOGLE_API_KEY}`
           );
           const googleData = await googleResponse.json();
 
           if (googleData.results.length > 0) {
             const location = googleData.results[0].geometry.location;
-            setCoordinates(location);
+            setCoordinates({
+              lat: location.lat,
+              lng: location.lng
+            });
           }
         }
       } catch (error) {
@@ -71,21 +71,21 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Log para debug
+    console.log('Data selecionada:', date);
+
     let data = {
       name,
       description,
       location,
       cep,
+      date: date || null, // Simplificando o envio da data
       latitude: coordinates.lat,
       longitude: coordinates.lng
     }
 
-    if (constructionDate) {
-      const formattedDate = new Date(constructionDate).toISOString().split('T')[0];
-      data.constructionDate = formattedDate;
-    } else {
-      data.constructionDate = '';
-    }
+    // Log para debug
+    console.log('Dados sendo enviados:', data);
 
     if (casaraoData?.id) {
       data.id = casaraoData.id;
@@ -98,7 +98,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     setDescription('');
     setLocation('');
     setCep('');
-    setConstructionDate('');
+    setDate('');
     setImage(null);
     setBase64("");
     setCoordinates({ lat: null, lng: null });
@@ -142,8 +142,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
         <input
           type="date"
           placeholder="Data de Construção"
-          value={constructionDate}
-          onChange={(e) => setConstructionDate(e.target.value)}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
           style={styles.input}
         />
           {base64 && (

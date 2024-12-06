@@ -26,8 +26,6 @@ jest.mock('multer', () => {
 
 // Mock para `fs.existsSync` e `fs.mkdirSync`
 jest.spyOn(fs, 'existsSync').mockImplementation(() => true);
-jest.spyOn(fs, 'mkdirSync').mockImplementation(() => {});
-
 // Configuração do app para testes
 app.post('/casaroes', (req, res) => {
   const { name, description, location, cep, date } = req.body;
