@@ -53,7 +53,7 @@ function CasaraoListPage({ isAdmin }) {
     }
   };
   const handleIconClick = () => {
-    setShowInput(!showInput); 
+    setShowInput(!showInput); // Alterna a exibição do input
   };
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -117,11 +117,12 @@ function CasaraoListPage({ isAdmin }) {
         ? `https://back-production-8285.up.railway.app/casaroes/${casaraoToEdit.id}`
         : `https://back-production-8285.up.railway.app/casaroes`;
         const response = await fetch(url, {
-          method: method, 
+          method: method, // Verifique se 'method' é uma string válida como 'POST' ou 'GET'
           headers: {
-            "Content-Type": "application/json", 
+            "Content-Type": "application/json", // Certifique-se de que o Content-Type esteja correto
           },
-          body: JSON.stringify({ formData, base64 }), 
+          body: JSON.stringify({ formData, base64 }), // Verifique se 'formData' e 'base64' são dados válidos
+        });        
       
       if (!response.ok) throw new Error(`Erro ao salvar o casarão: ${response.statusText}`);
       
@@ -246,24 +247,13 @@ function CasaraoListPage({ isAdmin }) {
                       )}
                       {!isAdmin && (
                         <>
-                          <div style={styles.actionButtons}>
-                            <IoIosStarOutline
-                              onClick={() => handleFavoritar(casarao)}
-                              style={{
-                                ...styles.actionIcon,
-                                color: favoritos.some(f => f.id === casarao.id) ? '#FFD700' : '#000'
-                              }}
-                              title={favoritos.some(f => f.id === casarao.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-                            />
-                            <IoMdCheckmarkCircleOutline
-                              onClick={() => handleMarcarVisitado(casarao)}
-                              style={{
-                                ...styles.actionIcon,
-                                color: visitados.some(v => v.id === casarao.id) ? '#4CAF50' : '#000'
-                              }}
-                              title={visitados.some(v => v.id === casarao.id) ? 'Desmarcar como visitado' : 'Marcar como visitado'}
-                            />
-                          </div>
+                          <button onClick={() => handleFavoritar(casarao)} style={styles.favoritoButton}>
+                            <IoIosStarOutline style={{ color: favoritos.some(favorito => favorito.id === casarao.id) ? 'gold' : 'gray' }} />
+                          </button>
+                          <button onClick={() => handleMarcarVisitado(casarao)} style={styles.visitadoButton}>
+                            <IoMdCheckmarkCircleOutline style={{ color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray' }} />
+                          </button>
+                          
                           <div style={styles.comentariosContainer}>
                             <h4>Comentários</h4>
                             <ul>
@@ -551,20 +541,6 @@ const styles = {
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
     zIndex: 1000,
     animation: 'fadeOut 3s forwards',
-  },
-  actionButtons: {
-    display: 'flex',
-    gap: '10px',
-    marginTop: '10px',
-  },
-  
-  actionIcon: {
-    fontSize: '24px',
-    cursor: 'pointer',
-    transition: 'transform 0.2s ease, color 0.2s ease',
-    '&:hover': {
-      transform: 'scale(1.1)',
-    }
   },
 };
 
