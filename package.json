@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"No tests defined yet\""
+    "test": "jest --config jest.config.js"
   },
   "keywords": [],
   "author": "",
