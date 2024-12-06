@@ -1,3 +1,4 @@
+
 import express from 'express';
 import mysql from 'mysql2';
 import multer from 'multer';
@@ -6,6 +7,7 @@ import fs from 'fs';
 import cors from 'cors';
 
 const app = express();
+<<<<<<< HEAD
 
 // Configuração mais permissiva do CORS
 app.use((req, res, next) => {
@@ -30,8 +32,11 @@ app.use(cors({
   credentials: true
 }));
 
+=======
+>>>>>>> 42c5e38bae227f07ab5a02134349c51a37306fa8
 app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({limit: '10mb', extended: true}));
+app.use(cors());
 
 // Servir arquivos estáticos da pasta 'uploads'
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
