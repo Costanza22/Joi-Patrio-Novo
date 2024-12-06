@@ -53,7 +53,7 @@ function CasaraoListPage({ isAdmin }) {
     }
   };
   const handleIconClick = () => {
-    setShowInput(!showInput); // Alterna a exibição do input
+    setShowInput(!showInput); 
   };
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -117,11 +117,11 @@ function CasaraoListPage({ isAdmin }) {
         ? `https://back-production-8285.up.railway.app/casaroes/${casaraoToEdit.id}`
         : `https://back-production-8285.up.railway.app/casaroes`;
         const response = await fetch(url, {
-          method: method, // Verifique se 'method' é uma string válida como 'POST' ou 'GET'
+          method: method, 
           headers: {
-            "Content-Type": "application/json", // Certifique-se de que o Content-Type esteja correto
+            "Content-Type": "application/json", 
           },
-          body: JSON.stringify({ formData, base64 }), // Verifique se 'formData' e 'base64' são dados válidos
+          body: JSON.stringify({ formData, base64 }), 
         });        
       
       if (!response.ok) throw new Error(`Erro ao salvar o casarão: ${response.statusText}`);
@@ -245,12 +245,21 @@ function CasaraoListPage({ isAdmin }) {
                           </button>
                         </>
                       )}
+                      ...
                       {!isAdmin && (
                         <>
-                          <button onClick={() => handleFavoritar(casarao)} style={styles.favoritoButton}>
+                          <button 
+                            onClick={() => handleFavoritar(casarao)} 
+                            style={styles.favoritoButton}
+                            title={favoritos.some(favorito => favorito.id === casarao.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                          >
                             <IoIosStarOutline style={{ color: favoritos.some(favorito => favorito.id === casarao.id) ? 'gold' : 'gray' }} />
                           </button>
-                          <button onClick={() => handleMarcarVisitado(casarao)} style={styles.visitadoButton}>
+                          <button 
+                            onClick={() => handleMarcarVisitado(casarao)} 
+                            style={styles.visitadoButton}
+                            title={visitados.some(visitado => visitado.id === casarao.id) ? "Marcar como não visitado" : "Marcar como visitado"}
+                          >
                             <IoMdCheckmarkCircleOutline style={{ color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray' }} />
                           </button>
                           
