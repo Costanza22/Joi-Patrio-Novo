@@ -549,6 +549,37 @@ const styles = {
     zIndex: 1000,
     animation: 'fadeOut 3s forwards',
   },
+  favoritoButton: {
+    padding: '12px',
+    fontSize: '24px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 5px',
+    transition: 'transform 0.2s ease',
+    '&:hover': {
+      transform: 'scale(1.1)'
+    }
+  },
+  
+  visitadoButton: {
+    padding: '12px',
+    fontSize: '24px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 5px',
+    transition: 'transform 0.2s ease',
+    '&:hover': {
+      transform: 'scale(1.1)'
+    }
+  },
 };
 
 export default CasaraoListPage;
