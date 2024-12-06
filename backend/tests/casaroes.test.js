@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../index'; 
+import app from '../index.js';
 
 describe('Testes de Autenticação e Autorização', () => {
   describe('Login de Administrador', () => {
