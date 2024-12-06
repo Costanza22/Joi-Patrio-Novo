@@ -1,3 +1,6 @@
+import request from 'supertest';
+import app from '../index'; 
+
 describe('Testes de Autenticação e Autorização', () => {
   describe('Login de Administrador', () => {
     it('deve autenticar admin com credenciais válidas', async () => {
@@ -51,7 +54,7 @@ describe('Testes de Autenticação e Autorização', () => {
 
       const token = loginResponse.body.token;
 
-      // Tentar criar casarão com token
+    
       const response = await request(app)
         .post('/casaroes')
         .set('Authorization', `Bearer ${token}`)
@@ -67,4 +70,4 @@ describe('Testes de Autenticação e Autorização', () => {
       expect(response.status).toBe(201);
     });
   });
-}); 
+});
