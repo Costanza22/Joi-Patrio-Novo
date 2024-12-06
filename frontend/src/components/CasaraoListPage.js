@@ -245,7 +245,6 @@ function CasaraoListPage({ isAdmin }) {
                           </button>
                         </>
                       )}
-                      ...
                       {!isAdmin && (
                         <>
                           <button 
@@ -262,7 +261,6 @@ function CasaraoListPage({ isAdmin }) {
                           >
                             <IoMdCheckmarkCircleOutline style={{ color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray' }} />
                           </button>
-                          
                           <div style={styles.comentariosContainer}>
                             <h4>Comentários</h4>
                             <ul>
