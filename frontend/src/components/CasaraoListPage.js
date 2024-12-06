@@ -381,7 +381,7 @@ const styles = {
     transform: 'scale(1.05)',
     backgroundColor: '#F4C8A1',
   },
-  
+
   imageContainer: {
     overflow: 'hidden',
     borderRadius: '15px', 
@@ -473,7 +473,7 @@ const styles = {
       transform: 'scale(1.1)',
     }
   },
-  
+
   suggestionContainer: {
     backgroundColor: '#FFF8DC',
     padding: '25px',
@@ -483,27 +483,27 @@ const styles = {
     maxWidth: '600px',
     margin: '0 auto 30px',
   },
-  
+
   suggestionTitle: {
     color: '#4B2A14',
     fontSize: '24px',
     marginBottom: '15px',
     textAlign: 'center',
   },
-  
+
   suggestionText: {
     color: '#666',
     marginBottom: '20px',
     textAlign: 'center',
     fontSize: '16px',
   },
-  
+
   suggestionForm: {
     display: 'flex',
     flexDirection: 'column',
     gap: '15px',
   },
-  
+
   suggestionInput: {
     padding: '15px',
     borderRadius: '10px',
@@ -518,7 +518,7 @@ const styles = {
       boxShadow: '0 0 5px rgba(139, 69, 19, 0.3)',
     }
   },
-  
+
   suggestionButton: {
     padding: '12px 25px',
     backgroundColor: '#8B4513',
@@ -535,7 +535,7 @@ const styles = {
       transform: 'translateY(-2px)',
     }
   },
-  
+
   successMessageContainer: {
     position: 'fixed',
     top: '20px',
@@ -549,37 +549,5 @@ const styles = {
     zIndex: 1000,
     animation: 'fadeOut 3s forwards',
   },
-  favoritoButton: {
-    padding: '12px',
-    fontSize: '24px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 5px',
-    transition: 'transform 0.2s ease',
-    '&:hover': {
-      transform: 'scale(1.1)'
-    }
-  },
-  
-  visitadoButton: {
-    padding: '12px',
-    fontSize: '24px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: '0 5px',
-    transition: 'transform 0.2s ease',
-    '&:hover': {
-      transform: 'scale(1.1)'
-    }
-  },
-};
 
 export default CasaraoListPage;
