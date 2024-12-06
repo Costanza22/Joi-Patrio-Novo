@@ -549,5 +549,5 @@ const styles = {
     zIndex: 1000,
     animation: 'fadeOut 3s forwards',
   },
-
+};
 export default CasaraoListPage;
