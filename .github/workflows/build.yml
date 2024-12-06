@@ -23,11 +23,12 @@ jobs:
         working-directory: ./backend
         run: |
           npm ci
+          npm install --save-dev @babel/core @babel/preset-env babel-jest
           chmod +x node_modules/.bin/jest
 
       - name: Run tests with coverage
         working-directory: ./backend
-        run: npm test -- --coverage
+        run: node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage
 
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarcloud-github-action@master
