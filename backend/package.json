@@ -7,8 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest --config jest.config.js --coverage",
-    "test:coverage": "jest --config jest.config.js --coverage --coverageReporters=lcov --coverageReporters=text-summary"
+    "test": "jest --config jest.config.js"
   },
   "keywords": [],
   "author": "",
