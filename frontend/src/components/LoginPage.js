@@ -101,22 +101,6 @@ const styles = {
   linkButtonHover: {
     backgroundColor: '#D2B48C', 
   },
-  select: {
-    padding: '12px',
-    marginBottom: '20px',
-    ...commonStyles.fullWidth,
-    borderRadius: commonStyles.borderRadius,
-    border: `1px solid ${commonStyles.colorBrown}`,
-    color: commonStyles.colorBrown,
-    fontSize: '16px',
-    fontWeight: 'bold',
-    backgroundColor: 'burlywood', 
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
-  },
-  selectHover: {
-    backgroundColor: '#F4A460', 
-  },
   registerButton: {
     padding: '12px',
     backgroundColor: '#D2B48C',
@@ -137,32 +121,38 @@ const styles = {
 function LoginPage({ onLogin, showCasaroes }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleLogin = () => {
-    if (role === 'admin' && username === 'admin' && password === 'admin') {
+    if (!username || !password) {
+      alert('Por favor, preencha todos os campos.');
+      return;
+    }
+
+    if (username === 'admin' && password === 'admin') {
       onLogin(true);
       showCasaroes();
-    } else if (role === 'visitante' && username !== '' && password !== '') {
-      // Considerando que o visitante só precisa de um nome de usuário e senha qualquer
+    } else {
       onLogin(false);
       showCasaroes();
-    } else {
-      alert('Credenciais inválidas.');
     }
   };
-  
 
   const handleRegister = () => {
-    if (password === confirmPassword) {
-      alert('Cadastro realizado com sucesso!');
-      setIsRegistering(false); 
-    } else {
-      alert('As senhas não coincidem!');
+    if (!username || !password || !confirmPassword) {
+      alert('Por favor, preencha todos os campos.');
+      return;
     }
+
+    if (password !== confirmPassword) {
+      alert('As senhas não coincidem!');
+      return;
+    }
+
+    alert('Cadastro realizado com sucesso!');
+    setIsRegistering(false);
   };
 
   return (
@@ -186,8 +176,6 @@ function LoginPage({ onLogin, showCasaroes }) {
           />
         ) : (
           <LoginForm
-            role={role}
-            setRole={setRole}
             username={username}
             setUsername={setUsername}
             password={password}
@@ -255,8 +243,6 @@ function RegisterForm({
 }
 
 function LoginForm({
-  role,
-  setRole,
   username,
   setUsername,
   password,
@@ -269,20 +255,8 @@ function LoginForm({
   return (
     <>
       <h2 style={styles.title}>Bem-vindo ao JoiPatrio</h2>
-      <p style={styles.subtitle}>
-        {role === 'visitante' ? 'Consultar Casarões' : 'Escolha sua função para acessar'}
-      </p>
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        style={styles.select}
-        onMouseEnter={(e) => (e.target.style.backgroundColor = '#F4A460')} // Hover efeito no select
-        onMouseLeave={(e) => (e.target.style.backgroundColor = 'burlywood')}
-      >
-        <option value="">Selecione uma função</option>
-        <option value="admin">Administrador</option>
-        <option value="visitante">Visitante</option>
-      </select>
+      <p style={styles.subtitle}>Consultar Casarões</p>
+      
       <input
         type="text"
         placeholder="Nome de Usuário"
@@ -290,15 +264,18 @@ function LoginForm({
         onChange={(e) => setUsername(e.target.value)}
         style={styles.input}
       />
+      
       <PasswordField
         password={password}
         setPassword={setPassword}
         showPassword={showPassword}
         setShowPassword={setShowPassword}
       />
+      
       <button onClick={handleLogin} style={styles.button}>
         Entrar
       </button>
+      
       <p style={styles.switchText}>
         Não tem uma conta?{' '}
         <button
