@@ -133,11 +133,10 @@ function LoginPage({ onLogin, showCasaroes }) {
 
     if (username === 'admin' && password === 'admin') {
       onLogin(true);
-      showCasaroes();
     } else {
       onLogin(false);
-      showCasaroes();
     }
+    showCasaroes();
   };
 
   const handleRegister = () => {
@@ -307,5 +306,3 @@ function PasswordField({ password, setPassword, showPassword, setShowPassword })
 }
 
 export default LoginPage;
-
-
