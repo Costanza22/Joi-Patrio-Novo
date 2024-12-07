@@ -11,9 +11,8 @@ function App() {
     setIsAdmin(adminStatus);
   };
 
-  // Esta função é chamada quando um visitante faz login
+ 
   const showCasaroes = () => {
-    // Aqui você pode adicionar a lógica que deseja executar para visitantes, se necessário.
     console.log('Visitante logado, mostrando casarões');
   };
 
