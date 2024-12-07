@@ -11,8 +11,9 @@ function App() {
     setIsAdmin(adminStatus);
   };
 
- 
+  
   const showCasaroes = () => {
+    /
     console.log('Visitante logado, mostrando casarões');
   };
 
@@ -25,5 +26,8 @@ function App() {
       )}
     </div>
   );
+}
+export default App;
+
 }
 export default App;
