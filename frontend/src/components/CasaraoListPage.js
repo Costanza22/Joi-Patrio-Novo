@@ -11,8 +11,14 @@ function CasaraoListPage({ isAdmin }) {
   const [showList, setShowList] = useState(false);
   const [error, setError] = useState(null);
   const [casaraoToEdit, setCasaraoToEdit] = useState(null);
-  const [favoritos, setFavoritos] = useState([]);
-  const [visitados, setVisitados] = useState([]);
+  const [favoritos, setFavoritos] = useState(() => {
+    const savedFavoritos = localStorage.getItem('favoritos');
+    return savedFavoritos ? JSON.parse(savedFavoritos) : [];
+  });
+  const [visitados, setVisitados] = useState(() => {
+    const savedVisitados = localStorage.getItem('visitados');
+    return savedVisitados ? JSON.parse(savedVisitados) : [];
+  });
   const [comentarios, setComentarios] = useState({});
   const [showInput, setShowInput] = useState(false); 
   const [suggestion, setSuggestion] = useState(''); 
@@ -68,19 +74,25 @@ function CasaraoListPage({ isAdmin }) {
   };
   
   const handleFavoritar = (casarao) => {
-    setFavoritos((prev) => 
-      prev.some(favorito => favorito.id === casarao.id) 
-      ? prev.filter(favorito => favorito.id !== casarao.id)
-      : [...prev, casarao]
-    );
+    setFavoritos((prev) => {
+      const newFavoritos = prev.some(favorito => favorito.id === casarao.id)
+        ? prev.filter(favorito => favorito.id !== casarao.id)
+        : [...prev, casarao];
+      
+      localStorage.setItem('favoritos', JSON.stringify(newFavoritos));
+      return newFavoritos;
+    });
   };
 
   const handleMarcarVisitado = (casarao) => {
-    setVisitados((prev) =>
-      prev.some(visitado => visitado.id === casarao.id)
-      ? prev.filter(visitado => visitado.id !== casarao.id)
-      : [...prev, casarao]
-    );
+    setVisitados((prev) => {
+      const newVisitados = prev.some(visitado => visitado.id === casarao.id)
+        ? prev.filter(visitado => visitado.id !== casarao.id)
+        : [...prev, casarao];
+      
+      localStorage.setItem('visitados', JSON.stringify(newVisitados));
+      return newVisitados;
+    });
   };
   const handleSortByName = () => {
     setCasaroes((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name)));
@@ -247,20 +259,13 @@ function CasaraoListPage({ isAdmin }) {
                       )}
                       {!isAdmin && (
                         <>
-                          <button 
-                            onClick={() => handleFavoritar(casarao)} 
-                            style={styles.favoritoButton}
-                            title={favoritos.some(favorito => favorito.id === casarao.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-                          >
+                          <button onClick={() => handleFavoritar(casarao)} style={styles.favoritoButton}>
                             <IoIosStarOutline style={{ color: favoritos.some(favorito => favorito.id === casarao.id) ? 'gold' : 'gray' }} />
                           </button>
-                          <button 
-                            onClick={() => handleMarcarVisitado(casarao)} 
-                            style={styles.visitadoButton}
-                            title={visitados.some(visitado => visitado.id === casarao.id) ? "Marcar como não visitado" : "Marcar como visitado"}
-                          >
+                          <button onClick={() => handleMarcarVisitado(casarao)} style={styles.visitadoButton}>
                             <IoMdCheckmarkCircleOutline style={{ color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray' }} />
                           </button>
+                          
                           <div style={styles.comentariosContainer}>
                             <h4>Comentários</h4>
                             <ul>
@@ -381,7 +386,7 @@ const styles = {
     transform: 'scale(1.05)',
     backgroundColor: '#F4C8A1',
   },
-
+  
   imageContainer: {
     overflow: 'hidden',
     borderRadius: '15px', 
@@ -473,7 +478,7 @@ const styles = {
       transform: 'scale(1.1)',
     }
   },
-
+  
   suggestionContainer: {
     backgroundColor: '#FFF8DC',
     padding: '25px',
@@ -483,27 +488,27 @@ const styles = {
     maxWidth: '600px',
     margin: '0 auto 30px',
   },
-
+  
   suggestionTitle: {
     color: '#4B2A14',
     fontSize: '24px',
     marginBottom: '15px',
     textAlign: 'center',
   },
-
+  
   suggestionText: {
     color: '#666',
     marginBottom: '20px',
     textAlign: 'center',
     fontSize: '16px',
   },
-
+  
   suggestionForm: {
     display: 'flex',
     flexDirection: 'column',
     gap: '15px',
   },
-
+  
   suggestionInput: {
     padding: '15px',
     borderRadius: '10px',
@@ -518,7 +523,7 @@ const styles = {
       boxShadow: '0 0 5px rgba(139, 69, 19, 0.3)',
     }
   },
-
+  
   suggestionButton: {
     padding: '12px 25px',
     backgroundColor: '#8B4513',
@@ -535,7 +540,7 @@ const styles = {
       transform: 'translateY(-2px)',
     }
   },
-
+  
   successMessageContainer: {
     position: 'fixed',
     top: '20px',
@@ -550,4 +555,5 @@ const styles = {
     animation: 'fadeOut 3s forwards',
   },
 };
+
 export default CasaraoListPage;
