@@ -133,7 +133,7 @@ function LoginPage({ onLogin, showCasaroes }) {
     }
   
     try {
-      const response = await axios.post('http://localhost:3000/login', {
+      const response = await axios.post('/login', {
         username,
         password,
       });
@@ -164,7 +164,7 @@ function LoginPage({ onLogin, showCasaroes }) {
     try {
       console.log('Tentando registrar com:', { username });
   
-      const response = await axios.post('http://localhost:3000/register', {
+      const response = await axios.post('/register', {
         username,
         password,
       }, {
