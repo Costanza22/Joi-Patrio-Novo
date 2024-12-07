@@ -4,7 +4,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
-const bcrypt = require('bcryptjs');
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const app = express();
