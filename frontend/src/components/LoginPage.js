@@ -133,15 +133,15 @@ function LoginPage({ onLogin, showCasaroes }) {
     }
   
     try {
-      const response = await axios.post('https://joinville-version.vercel.app/login', {
+      const response = await axios.post('/login', {
         username,
         password,
       });
   
       if (response.data.token) {
         alert('Login bem-sucedido!');
-        localStorage.setItem('token', response.data.token);
-        onLogin(response.data.isAdmin);
+        localStorage.setItem('token', response.data.token); // Salvar o token no localStorage
+        onLogin(true);
         showCasaroes();
       }
     } catch (error) {
@@ -348,4 +348,5 @@ function PasswordField({ password, setPassword, showPassword, setShowPassword })
 }
 
 export default LoginPage;
+
 
