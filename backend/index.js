@@ -1,9 +1,10 @@
-import express from 'express';
 import mysql from 'mysql2';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
+import bcrypt from 'bcrypt.js';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 
@@ -71,22 +72,43 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Rota para Cadastro
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-      return res.status(400).json({ message: 'Por favor, preencha todos os campos.' });
+    return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // First check if user already exists
+  const checkUserSql = 'SELECT * FROM users WHERE username = ?';
+  db.query(checkUserSql, [username], async (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar usuário:', err);
+      return res.status(500).json({ message: 'Erro ao verificar usuário.', error: err });
+    }
 
-  const sql = 'INSERT INTO users (username, password) VALUES (?, ?)';
-  db.query(sql, [username, hashedPassword], (err, result) => {
-      if (err) {
-          return res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
-      }
-      res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
+    if (results.length > 0) {
+      return res.status(400).json({ message: 'Este nome de usuário já está em uso.' });
+    }
+
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const insertSql = 'INSERT INTO users (username, password) VALUES (?, ?)';
+      
+      db.query(insertSql, [username, hashedPassword], (err, result) => {
+        if (err) {
+          console.error('Erro ao registrar usuário:', err);
+          return res.status(500).json({ message: 'Erro ao registrar usuário.', error: err });
+        }
+        res.status(201).json({ 
+          success: true,
+          message: 'Usuário registrado com sucesso!' 
+        });
+      });
+    } catch (err) {
+      console.error('Erro ao criptografar senha:', err);
+      res.status(500).json({ message: 'Erro no servidor.', error: err });
+    }
   });
 });
 
@@ -95,26 +117,36 @@ app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-      return res.status(400).json({ message: 'Por favor, preencha todos os campos.' });
+      return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
   }
 
   const sql = 'SELECT * FROM users WHERE username = ?';
   db.query(sql, [username], async (err, results) => {
-      if (err || results.length === 0) {
-          return res.status(401).json({ message: 'Credenciais inválidas.' });
+      if (err) {
+          return res.status(500).json({ message: 'Erro no servidor.', error: err });
+      }
+
+      if (results.length === 0) {
+          return res.status(401).json({ message: 'Usuário não encontrado.' });
       }
 
       const user = results[0];
-      const match = await bcrypt.compare(password, user.password);
 
-      if (!match) {
-          return res.status(401).json({ message: 'Senha incorreta.' });
+      try {
+          const isPasswordValid = await bcrypt.compare(password, user.password);
+
+          if (!isPasswordValid) {
+              return res.status(401).json({ message: 'Senha incorreta.' });
+          }
+
+          const token = jwt.sign({ id: user.id }, 'seu_segredo', { expiresIn: '1h' });
+          res.json({ message: 'Login bem-sucedido!', token });
+      } catch (err) {
+          res.status(500).json({ message: 'Erro ao verificar senha.', error: err });
       }
-
-      const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: '1h' });
-      res.status(200).json({ message: 'Login realizado com sucesso!', token });
   });
 });
+
 
 
 
