@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import axios from 'axios';
 
 const commonStyles = {
   colorBrown: '#8B4513',
@@ -125,33 +126,74 @@ function LoginPage({ onLogin, showCasaroes }) {
   const [isRegistering, setIsRegistering] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!username || !password) {
       alert('Por favor, preencha todos os campos.');
       return;
     }
-
-    if (username === 'admin' && password === 'admin') {
-      onLogin(true);
-    } else {
+  
+    try {
+      const response = await axios.post('http://localhost:3000/login', {
+        username,
+        password,
+      });
+  
+      if (response.data.token) {
+        alert('Login bem-sucedido!');
+        localStorage.setItem('token', response.data.token); // Salvar o token no localStorage
+        onLogin(true);
+        showCasaroes();
+      }
+    } catch (error) {
+      alert('Erro no login: ' + (error.response?.data?.message || 'Tente novamente.'));
       onLogin(false);
     }
-    showCasaroes();
   };
-
-  const handleRegister = () => {
+  
+  const handleRegister = async () => {
     if (!username || !password || !confirmPassword) {
       alert('Por favor, preencha todos os campos.');
       return;
     }
-
+  
     if (password !== confirmPassword) {
       alert('As senhas não coincidem!');
       return;
     }
-
-    alert('Cadastro realizado com sucesso!');
-    setIsRegistering(false);
+  
+    try {
+      console.log('Tentando registrar com:', { username });
+  
+      const response = await axios.post('http://localhost:3000/register', {
+        username,
+        password,
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response.data.success) {
+        alert('Cadastro realizado com sucesso! Você já pode fazer login.');
+        setIsRegistering(false);
+        setUsername('');
+        setPassword('');
+        setConfirmPassword('');
+      }
+    } catch (error) {
+      console.error('Detalhes completos do erro:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        statusText: error.response?.statusText
+      });
+  
+      const errorMessage = error.response?.data?.message 
+        || error.response?.data 
+        || 'Não foi possível conectar ao servidor. Verifique se o servidor está rodando.';
+    
+      alert(`Erro no registro: ${errorMessage}`);
+    }
   };
 
   return (
@@ -306,4 +348,3 @@ function PasswordField({ password, setPassword, showPassword, setShowPassword })
 }
 
 export default LoginPage;
-
