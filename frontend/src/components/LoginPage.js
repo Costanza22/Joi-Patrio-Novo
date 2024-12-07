@@ -133,7 +133,7 @@ function LoginPage({ onLogin, showCasaroes }) {
     }
   
     try {
-      const response = await axios.post('back-production-8285.up.railway.app/login', {
+      const response = await axios.post('https://back-production-8285.up.railway.app/login', {
         username,
         password,
       });
@@ -164,7 +164,7 @@ function LoginPage({ onLogin, showCasaroes }) {
     try {
       console.log('Tentando registrar com:', { username });
   
-      const response = await axios.post('back-production-8285.up.railway.app/register', {
+      const response = await axios.post('https://back-production-8285.up.railway.app/register', {
         username,
         password,
       }, {
@@ -348,5 +348,3 @@ function PasswordField({ password, setPassword, showPassword, setShowPassword })
 }
 
 export default LoginPage;
-
-
