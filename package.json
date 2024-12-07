@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"No tests defined yet\""
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +30,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "jest": "^29.7.0",
     "nyc": "^17.1.0",
     "sonar-scanner": "^3.1.0",

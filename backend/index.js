@@ -1,17 +1,18 @@
-
 import express from 'express';
 import mysql from 'mysql2';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app = express();
-<<<<<<< HEAD
+
 
 // Configuração mais permissiva do CORS
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.header('Access-Control-Allow-Origin', 'https://joinville-version.vercel.app/');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -24,21 +25,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// Mantenha também a configuração do cors
+
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://joinville-version.vercel.app/',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true
 }));
 
-=======
->>>>>>> 42c5e38bae227f07ab5a02134349c51a37306fa8
+
 app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({limit: '10mb', extended: true}));
 app.use(cors());
 
-// Servir arquivos estáticos da pasta 'uploads'
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Conexão ao banco de dados MySQL
@@ -57,7 +56,6 @@ db.connect((err) => {
   console.log('Conectado ao MySQL');
 });
 
-// Configuração do multer para salvar imagens em disco
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads/';
@@ -73,22 +71,42 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Rota para Cadastro
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-      return res.status(400).json({ message: 'Por favor, preencha todos os campos.' });
+    return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const checkUserSql = 'SELECT * FROM users WHERE username = ?';
+  db.query(checkUserSql, [username], async (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar usuário:', err);
+      return res.status(500).json({ message: 'Erro ao verificar usuário.', error: err });
+    }
 
-  const sql = 'INSERT INTO users (username, password) VALUES (?, ?)';
-  db.query(sql, [username, hashedPassword], (err, result) => {
-      if (err) {
-          return res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
-      }
-      res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
+    if (results.length > 0) {
+      return res.status(400).json({ message: 'Este nome de usuário já está em uso.' });
+    }
+
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const insertSql = 'INSERT INTO users (username, password) VALUES (?, ?)';
+      
+      db.query(insertSql, [username, hashedPassword], (err, result) => {
+        if (err) {
+          console.error('Erro ao registrar usuário:', err);
+          return res.status(500).json({ message: 'Erro ao registrar usuário.', error: err });
+        }
+        res.status(201).json({ 
+          success: true,
+          message: 'Usuário registrado com sucesso!' 
+        });
+      });
+    } catch (err) {
+      console.error('Erro ao criptografar senha:', err);
+      res.status(500).json({ message: 'Erro no servidor.', error: err });
+    }
   });
 });
 
@@ -97,30 +115,52 @@ app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-      return res.status(400).json({ message: 'Por favor, preencha todos os campos.' });
+      return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
   }
 
   const sql = 'SELECT * FROM users WHERE username = ?';
   db.query(sql, [username], async (err, results) => {
-      if (err || results.length === 0) {
-          return res.status(401).json({ message: 'Credenciais inválidas.' });
+      if (err) {
+          return res.status(500).json({ message: 'Erro no servidor.', error: err });
+      }
+
+      if (results.length === 0) {
+          return res.status(401).json({ message: 'Usuário não encontrado.' });
       }
 
       const user = results[0];
-      const match = await bcrypt.compare(password, user.password);
 
-      if (!match) {
-          return res.status(401).json({ message: 'Senha incorreta.' });
+      try {
+          const isPasswordValid = await bcrypt.compare(password, user.password);
+
+          if (!isPasswordValid) {
+              return res.status(401).json({ message: 'Senha incorreta.' });
+          }
+
+          // Verifica se o usuário é o costanza
+          const isAdmin = username === 'costanza';
+          
+          const token = jwt.sign(
+              { id: user.id, isAdmin }, 
+              'seu_segredo', 
+              { expiresIn: '1h' }
+          );
+          
+          res.json({ 
+              message: 'Login bem-sucedido!', 
+              token,
+              isAdmin
+          });
+      } catch (err) {
+          res.status(500).json({ message: 'Erro ao verificar senha.', error: err });
       }
-
-      const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: '1h' });
-      res.status(200).json({ message: 'Login realizado com sucesso!', token });
   });
 });
 
 
 
-app.post('/casaroes', (req, res) => { // Verifica se `date` está presente no corpo da requisição
+
+app.post('/casaroes', (req, res) => { 
   const {formData, base64}= req.body;
   const { name, description, location, cep, date } = formData; 
 
@@ -158,7 +198,7 @@ app.put('/casaroes/:id', (req, res) => {
 
   const image_path = base64;
 
-  // Cria uma consulta dinâmica com os campos que foram enviados
+
   let sql = 'UPDATE casaroes SET ';
   const values = [];
   
@@ -223,7 +263,7 @@ app.delete('/casaroes/:id', (req, res) => {
   });
 });
 
-
+export { app };
 
 // Inicia o servidor
 app.listen(5000, () => {
