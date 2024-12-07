@@ -133,10 +133,18 @@ function LoginPage({ onLogin, showCasaroes }) {
     }
   
     try {
-      const response = await axios.post('https://back-production-8285.up.railway.app/login', {
-        username,
-        password,
-      });
+      const response = await axios.post('https://back-production-8285.up.railway.app/login', 
+        {
+          username,
+          password,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
   
       if (response.data.token) {
         alert('Login bem-sucedido!');
