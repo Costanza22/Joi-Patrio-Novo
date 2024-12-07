@@ -13,7 +13,7 @@ function App() {
 
   
   const showCasaroes = () => {
-    /
+    
     console.log('Visitante logado, mostrando casarões');
   };
 
