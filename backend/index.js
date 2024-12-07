@@ -1,13 +1,13 @@
+import express from 'express';
 import mysql from 'mysql2';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const app = express();
-
 
 // Configuração mais permissiva do CORS
 app.use((req, res, next) => {
@@ -23,7 +23,6 @@ app.use((req, res, next) => {
   
   next();
 });
-
 // Mantenha também a configuração do cors
 app.use(cors({
   origin: 'http://localhost:3000',
@@ -31,8 +30,6 @@ app.use(cors({
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true
 }));
-
-
 app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({limit: '10mb', extended: true}));
 app.use(cors());
@@ -74,11 +71,9 @@ const upload = multer({ storage });
 
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
-
   if (!username || !password) {
     return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
   }
-
   // First check if user already exists
   const checkUserSql = 'SELECT * FROM users WHERE username = ?';
   db.query(checkUserSql, [username], async (err, results) => {
@@ -86,11 +81,9 @@ app.post('/register', async (req, res) => {
       console.error('Erro ao verificar usuário:', err);
       return res.status(500).json({ message: 'Erro ao verificar usuário.', error: err });
     }
-
     if (results.length > 0) {
       return res.status(400).json({ message: 'Este nome de usuário já está em uso.' });
     }
-
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const insertSql = 'INSERT INTO users (username, password) VALUES (?, ?)';
@@ -111,34 +104,26 @@ app.post('/register', async (req, res) => {
     }
   });
 });
-
 // Rota para Login
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
-
   if (!username || !password) {
       return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
   }
-
   const sql = 'SELECT * FROM users WHERE username = ?';
   db.query(sql, [username], async (err, results) => {
       if (err) {
           return res.status(500).json({ message: 'Erro no servidor.', error: err });
       }
-
       if (results.length === 0) {
           return res.status(401).json({ message: 'Usuário não encontrado.' });
       }
-
       const user = results[0];
-
       try {
           const isPasswordValid = await bcrypt.compare(password, user.password);
-
           if (!isPasswordValid) {
               return res.status(401).json({ message: 'Senha incorreta.' });
           }
-
           const token = jwt.sign({ id: user.id }, 'seu_segredo', { expiresIn: '1h' });
           res.json({ message: 'Login bem-sucedido!', token });
       } catch (err) {
@@ -146,10 +131,6 @@ app.post('/login', (req, res) => {
       }
   });
 });
-
-
-
-
 app.post('/casaroes', (req, res) => { // Verifica se `date` está presente no corpo da requisição
   const {formData, base64}= req.body;
   const { name, description, location, cep, date } = formData; 
@@ -253,9 +234,11 @@ app.delete('/casaroes/:id', (req, res) => {
   });
 });
 
-export { app };
+const port = 5000;
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Servidor rodando na porta ${port}`);
+  });
+}
 
-// Inicia o servidor
-app.listen(5000, () => {
-  console.log('Servidor rodando');
-});
+export default app;
