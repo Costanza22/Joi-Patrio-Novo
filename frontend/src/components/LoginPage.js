@@ -133,7 +133,7 @@ function LoginPage({ onLogin, showCasaroes }) {
     }
   
     try {
-      const response = await axios.post('/login', {
+      const response = await axios.post('https://joinville-version.vercel.app/login', {
         username,
         password,
       });
