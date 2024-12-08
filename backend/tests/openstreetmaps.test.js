@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from 'axios';  
 
 describe('Teste da API de Busca de Local', () => {
   const baseURL = 'https://nominatim.openstreetmap.org/search';
