@@ -13,12 +13,22 @@ function App() {
     setUsername(currentUsername);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('isAdmin');
+    setIsLoggedIn(false);
+    setIsAdmin(false);
+  };
+
   return (
     <div>
       {!isLoggedIn ? (
         <LoginPage onLogin={handleLogin} showCasaroes={() => {}} />
       ) : (
-        <CasaraoListPage isAdmin={username === 'costanza'} />
+        <CasaraoListPage 
+          isAdmin={isAdmin} 
+          onLogout={handleLogout}
+        />
       )}
     </div>
   );
