@@ -133,14 +133,14 @@ function LoginPage({ onLogin, showCasaroes }) {
     }
   
     try {
-      const response = await axios.post('https://back-production-8285.up.railway.app/login', {
+      const response = await axios.post('/login', {
         username,
         password,
       });
   
       if (response.data.token) {
         alert('Login bem-sucedido!');
-        localStorage.setItem('token', response.data.token); // Salvar o token no localStorage
+        localStorage.setItem('token', response.data.token); 
         onLogin(true);
         showCasaroes();
       }
@@ -164,7 +164,7 @@ function LoginPage({ onLogin, showCasaroes }) {
     try {
       console.log('Tentando registrar com:', { username });
   
-      const response = await axios.post('https://back-production-8285.up.railway.app/register', {
+      const response = await axios.post('/register', {
         username,
         password,
       }, {
