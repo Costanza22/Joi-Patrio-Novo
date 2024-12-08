@@ -140,8 +140,9 @@ function LoginPage({ onLogin, showCasaroes }) {
   
       if (response.data.token) {
         alert('Login bem-sucedido!');
-        localStorage.setItem('token', response.data.token); // Salvar o token no localStorage
-        onLogin(true);
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('isAdmin', username === 'costanza');
+        onLogin(true, username === 'costanza', username);
         showCasaroes();
       }
     } catch (error) {

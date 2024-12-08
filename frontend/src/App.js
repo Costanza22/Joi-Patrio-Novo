@@ -3,26 +3,22 @@ import LoginPage from './components/LoginPage';
 import CasaraoListPage from './components/CasaraoListPage';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [username, setUsername] = useState('');
 
-  const handleLogin = (adminStatus) => {
-    setIsAuthenticated(true);
+  const handleLogin = (loginStatus, adminStatus, currentUsername) => {
+    setIsLoggedIn(loginStatus);
     setIsAdmin(adminStatus);
-  };
-
-  
-  const showCasaroes = () => {
-    
-    console.log('Visitante logado, mostrando casarões');
+    setUsername(currentUsername);
   };
 
   return (
-    <div className="App">
-      {isAuthenticated ? (
-        <CasaraoListPage isAdmin={isAdmin} />
+    <div>
+      {!isLoggedIn ? (
+        <LoginPage onLogin={handleLogin} showCasaroes={() => {}} />
       ) : (
-        <LoginPage onLogin={handleLogin} showCasaroes={showCasaroes} />
+        <CasaraoListPage isAdmin={username === 'costanza'} />
       )}
     </div>
   );

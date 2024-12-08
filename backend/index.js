@@ -73,6 +73,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+
+// aqui voce precisa dizer se o usuario e admin ou nao
+// precisa ter um campo na tabela de usuario pra saber que tipo de usuario ele e
+//e depois, no front, voce precisa verificar que tipo de usuario ta logado. se for admin, mostra o botao, senao nao
+// sugiro usar o cursor pra ver se ajuda tambem 
+
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
@@ -118,38 +124,43 @@ app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-      return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
+    return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
   }
 
   const sql = 'SELECT * FROM users WHERE username = ?';
   db.query(sql, [username], async (err, results) => {
-      if (err) {
-          return res.status(500).json({ message: 'Erro no servidor.', error: err });
+    if (err) {
+      return res.status(500).json({ message: 'Erro no servidor.', error: err });
+    }
+
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'Usuário não encontrado.' });
+    }
+
+    const user = results[0];
+
+    try {
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Senha incorreta.' });
       }
 
-      if (results.length === 0) {
-          return res.status(401).json({ message: 'Usuário não encontrado.' });
-      }
+      // Verificação direta se é o
 
-      const user = results[0];
-
-      try {
-          const isPasswordValid = await bcrypt.compare(password, user.password);
-
-          if (!isPasswordValid) {
-              return res.status(401).json({ message: 'Senha incorreta.' });
-          }
-
-          const token = jwt.sign({ id: user.id }, 'seu_segredo', { expiresIn: '1h' });
-          res.json({ message: 'Login bem-sucedido!', token });
-      } catch (err) {
-          res.status(500).json({ message: 'Erro ao verificar senha.', error: err });
-      }
+      const token = jwt.sign({ id: user.id }, 'seu_segredo', { expiresIn: '1h' });
+      res.json({ message: 'Login bem-sucedido!', token });
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao verificar senha.', error: err });
+    }
   });
 });
 
 
-
+// Na hora de cadastrar, voce precisa passar o ID do usuario que ta logado e salvar esse ID pra cada casarao
+// aqui na hora de listar, voce precisa receber o ID do usuario tambem e filtrar (where userId === tal)
+// por isso qualquer um consegue ver todos, agora. 
+// voce nao ta filtrando essa lista
 
 app.post('/casaroes', (req, res) => { // Verifica se `date` está presente no corpo da requisição
   const {formData, base64}= req.body;

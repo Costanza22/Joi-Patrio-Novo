@@ -6,6 +6,9 @@ import { BsFillPatchQuestionFill } from 'react-icons/bs';
 
 
 function CasaraoListPage({ isAdmin }) {
+  console.log('CasaraoListPage - isAdmin:', isAdmin);
+  console.log('localStorage isAdmin:', localStorage.getItem('isAdmin'));
+
   const [casaroes, setCasaroes] = useState([]);
   const [showCadastro, setShowCadastro] = useState(false);
   const [showList, setShowList] = useState(false);
