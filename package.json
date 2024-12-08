@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 {
   "name": "joinville-version",
   "version": "1.0.0",
@@ -33,4 +31,3 @@
     "sonar-scanner": "^3.1.0"
   }
 }
->>>>>>> 5577e2b02b5621597e28f1e033197cd17607f6b6
