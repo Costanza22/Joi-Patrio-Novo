@@ -140,7 +140,11 @@ function LoginPage({ onLogin, showCasaroes }) {
   
       if (response.data.token) {
         alert('Login bem-sucedido!');
+<<<<<<< HEAD
         localStorage.setItem('token', response.data.token); // Salvar o token no localStorage
+=======
+        localStorage.setItem('token', response.data.token); 
+>>>>>>> 5577e2b02b5621597e28f1e033197cd17607f6b6
         onLogin(true);
         showCasaroes();
       }

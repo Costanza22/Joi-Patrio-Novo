@@ -6,7 +6,11 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.mjs",
+<<<<<<< HEAD
     "coverage": "jest --coverage --config jest.config.mjs"
+=======
+    "coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage --config jest.config.mjs"
+>>>>>>> 5577e2b02b5621597e28f1e033197cd17607f6b6
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.3",
@@ -23,9 +27,14 @@
     "@babel/core": "^7.x",
     "@babel/preset-env": "^7.x",
     "babel-jest": "^29.x",
+<<<<<<< HEAD
     "jest": "^29.7.0",
     "jest-html-reporter": "^3.10.2",
+=======
+    "jest": "^29.x",
+>>>>>>> 5577e2b02b5621597e28f1e033197cd17607f6b6
     "nodemon": "^2.x",
     "supertest": "^6.3.4"
   }
 }
+

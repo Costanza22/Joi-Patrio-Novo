@@ -24,7 +24,11 @@ jobs:
         run: npm install
 
       - name: Run tests with coverage
+<<<<<<< HEAD
         run: npm run coverage
+=======
+        run: npm run test:coverage
+>>>>>>> 5577e2b02b5621597e28f1e033197cd17607f6b6
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
