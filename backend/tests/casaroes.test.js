@@ -1,14 +1,11 @@
 import request from 'supertest';
-import app from './App.js';
-
 describe('Testes da API de Casarões', () => {
-  // ... testes existentes ...
 
   describe('Validações de Entrada', () => {
     it('deve rejeitar casarão com nome muito curto', async () => {
       const novoCasarao = {
         formData: {
-          name: 'A',  // nome muito curto
+          name: 'A',  
           description: 'Descrição válida',
           location: 'Localização válida',
           date: new Date().toISOString()
@@ -53,7 +50,7 @@ describe('Testes da API de Casarões', () => {
           location: 'Localização válida',
           date: new Date().toISOString()
         },
-        base64: 'data:image/gif;base64,R0lGODlh...' // formato GIF não suportado
+        base64: 'data:image/gif;base64,R0lGODlh...' 
       };
 
       const response = await request(app)
@@ -64,7 +61,7 @@ describe('Testes da API de Casarões', () => {
     });
 
     it('deve rejeitar imagem muito grande', async () => {
-      // Criar uma string base64 grande
+  
       const grandeBase64 = 'data:image/jpeg;base64,' + 'A'.repeat(1000000);
 
       const novoCasarao = {
@@ -87,7 +84,7 @@ describe('Testes da API de Casarões', () => {
 
   describe('Paginação e Filtros', () => {
     beforeEach(async () => {
-      // Inserir vários casarões para testar paginação
+     
       const casaroes = Array.from({ length: 15 }, (_, i) => ({
         name: `Casarão ${i + 1}`,
         description: `Descrição ${i + 1}`,
@@ -175,7 +172,7 @@ describe('Testes da API de Casarões', () => {
     });
 
     it('deve retornar 500 para erro interno do servidor', async () => {
-      // Simular um erro no banco de dados
+    
       jest.spyOn(db.collection('casaroes'), 'find').mockImplementationOnce(() => {
         throw new Error('Erro simulado do banco de dados');
       });
@@ -197,10 +194,10 @@ describe('Testes da API de Casarões', () => {
     });
 
     it('deve invalidar cache após POST', async () => {
-      // Fazer primeira requisição
+     
       await request(app).get('/casaroes');
 
-      // Criar novo casarão
+      
       await request(app)
         .post('/casaroes')
         .send({
@@ -212,7 +209,7 @@ describe('Testes da API de Casarões', () => {
           }
         });
 
-      // Segunda requisição deve ter dados atualizados
+      
       const response = await request(app).get('/casaroes');
       expect(response.body.length).toBeGreaterThan(0);
     });
@@ -220,6 +217,5 @@ describe('Testes da API de Casarões', () => {
 });
 
 afterAll(done => {
-  // Feche explicitamente o servidor após os testes
   done();
 });
