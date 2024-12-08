@@ -73,7 +73,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post('https://back-production-8285.up.railway.app/register', async (req, res) => {
+app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -114,7 +114,7 @@ app.post('https://back-production-8285.up.railway.app/register', async (req, res
 });
 
 // Rota para Login
-app.post('https://back-production-8285.up.railway.app/login', (req, res) => {
+app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
