@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { BiExit } from 'react-icons/bi';
 import axios from 'axios';
 
 const commonStyles = {
@@ -296,9 +297,47 @@ function LoginForm({
 }) {
   return (
     <>
-      <h2 style={styles.title}>Bem-vindo ao JoiPatrio</h2>
-      <p style={styles.subtitle}>Consultar Casarões</p>
-      
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: '20px',
+        position: 'relative'
+      }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          flex: 1
+        }}>
+          <h2 style={{...styles.title, margin: 0}}>Bem-vindo ao JoiPatrio</h2>
+          <p style={{...styles.subtitle, margin: '5px 0 0 0'}}>Consultar Casarões</p>
+        </div>
+        <a 
+          href="https://joi-patrio.vercel.app/"
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            backgroundColor: '#8B4513',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '10px 15px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '16px',
+            textDecoration: 'none',
+            transition: 'background-color 0.3s ease',
+          }}
+        >
+          <BiExit />
+          Sair
+        </a>
+      </div>
       <input
         type="text"
         placeholder="Nome de Usuário"
