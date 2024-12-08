@@ -1,11 +1,17 @@
 export default {
-  transform: {},
   testEnvironment: 'node',
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
+  transform: {
+    '^.+\\.js$': 'babel-jest'
   },
-  // Adicionar configurações de cobertura
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1.js'
+  },
+  testMatch: [
+    "**/__tests__/**/*.js?(x)",
+    "**/?(*.)+(spec|test).js?(x)"
+  ],
   collectCoverage: true,
   coverageReporters: ['lcov', 'text'],
   coverageDirectory: 'coverage'
-}; 
+};
+

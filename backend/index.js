@@ -4,7 +4,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const app = express();
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
   next();
 });
 
-
+// Mantenha também a configuração do cors
 app.use(cors({
   origin: 'https://joinville-version.vercel.app/',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -38,6 +38,7 @@ app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({limit: '10mb', extended: true}));
 app.use(cors());
 
+// Servir arquivos estáticos da pasta 'uploads'
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Conexão ao banco de dados MySQL
@@ -56,6 +57,7 @@ db.connect((err) => {
   console.log('Conectado ao MySQL');
 });
 
+// Configuração do multer para salvar imagens em disco
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads/';
@@ -71,13 +73,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.post('/register', async (req, res) => {
+app.post('https://back-production-8285.up.railway.app/register', async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ message: 'Usuário e senha são obrigatórios!' });
   }
 
+  // First check if user already exists
   const checkUserSql = 'SELECT * FROM users WHERE username = ?';
   db.query(checkUserSql, [username], async (err, results) => {
     if (err) {
@@ -111,7 +114,7 @@ app.post('/register', async (req, res) => {
 });
 
 // Rota para Login
-app.post('/login', (req, res) => {
+app.post('https://back-production-8285.up.railway.app/login', (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -137,20 +140,8 @@ app.post('/login', (req, res) => {
               return res.status(401).json({ message: 'Senha incorreta.' });
           }
 
-          // Verifica se o usuário é o costanza
-          const isAdmin = username === 'costanza';
-          
-          const token = jwt.sign(
-              { id: user.id, isAdmin }, 
-              'seu_segredo', 
-              { expiresIn: '1h' }
-          );
-          
-          res.json({ 
-              message: 'Login bem-sucedido!', 
-              token,
-              isAdmin
-          });
+          const token = jwt.sign({ id: user.id }, 'seu_segredo', { expiresIn: '1h' });
+          res.json({ message: 'Login bem-sucedido!', token });
       } catch (err) {
           res.status(500).json({ message: 'Erro ao verificar senha.', error: err });
       }
@@ -160,7 +151,7 @@ app.post('/login', (req, res) => {
 
 
 
-app.post('/casaroes', (req, res) => { 
+app.post('/casaroes', (req, res) => { // Verifica se `date` está presente no corpo da requisição
   const {formData, base64}= req.body;
   const { name, description, location, cep, date } = formData; 
 
@@ -198,7 +189,7 @@ app.put('/casaroes/:id', (req, res) => {
 
   const image_path = base64;
 
-
+  // Cria uma consulta dinâmica com os campos que foram enviados
   let sql = 'UPDATE casaroes SET ';
   const values = [];
   

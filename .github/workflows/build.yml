@@ -5,31 +5,28 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   sonarcloud:
-    name: SonarQube Cloud
+    name: SonarCloud
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
 
       - name: Install dependencies
-        working-directory: ./backend
-        run: |
-          npm ci
-          chmod +x node_modules/.bin/jest
+        run: npm install
 
       - name: Run tests with coverage
-        working-directory: ./backend
-        run: npm test -- --coverage
+        run: npm run coverage
 
-      - name: SonarQube Cloud Scan
+      - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
