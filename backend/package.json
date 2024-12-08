@@ -5,25 +5,16 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --coverageReporters=lcov --coverageReporters=text-summary",
+    "sonar": "node_modules/.bin/sonar-scanner"
   },
-  "dependencies": {
-    "@react-google-maps/api": "^2.20.3",
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "express": "^4.21.1",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "^1.4.5-lts.1",
-    "mysql2": "^3.11.3",
-    "react-icons": "^5.3.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.x",
-    "@babel/preset-env": "^7.x",
-    "babel-jest": "^29.x",
-    "jest": "^29.x",
-    "supertest": "^6.x",
-    "nodemon": "^2.x"
+  "jest": {
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/coverage/**"
+    ],
+    "testEnvironment": "node"
   }
 }
