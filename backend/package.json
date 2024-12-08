@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --config jest.config.mjs"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.mjs",
+    "coverage": "jest --coverage --config jest.config.mjs"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.3",
@@ -25,8 +25,7 @@
     "babel-jest": "^29.x",
     "jest": "^29.x",
     "nodemon": "^2.x",
-    "supertest": "^6.x"
+    "supertest": "^6.3.4"
   }
 }
-
 
