@@ -1,5 +1,6 @@
 import request from 'supertest';
 describe('Testes da API de Casarões', () => {
+ 
 
   describe('Validações de Entrada', () => {
     it('deve rejeitar casarão com nome muito curto', async () => {
@@ -84,7 +85,6 @@ describe('Testes da API de Casarões', () => {
 
   describe('Paginação e Filtros', () => {
     beforeEach(async () => {
-     
       const casaroes = Array.from({ length: 15 }, (_, i) => ({
         name: `Casarão ${i + 1}`,
         description: `Descrição ${i + 1}`,
@@ -172,7 +172,6 @@ describe('Testes da API de Casarões', () => {
     });
 
     it('deve retornar 500 para erro interno do servidor', async () => {
-    
       jest.spyOn(db.collection('casaroes'), 'find').mockImplementationOnce(() => {
         throw new Error('Erro simulado do banco de dados');
       });
@@ -194,10 +193,9 @@ describe('Testes da API de Casarões', () => {
     });
 
     it('deve invalidar cache após POST', async () => {
-     
       await request(app).get('/casaroes');
 
-      
+      // Criar novo casarão
       await request(app)
         .post('/casaroes')
         .send({
@@ -208,8 +206,6 @@ describe('Testes da API de Casarões', () => {
             date: new Date().toISOString()
           }
         });
-
-      
       const response = await request(app).get('/casaroes');
       expect(response.body.length).toBeGreaterThan(0);
     });
