@@ -1,3 +1,4 @@
+import request from 'supertest';
 describe('Testes da API de Casarões', () => {
  
 
