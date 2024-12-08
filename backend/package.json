@@ -6,8 +6,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
-    "sonar": "node_modules/.bin/sonar-scanner"
+    "coverage": "jest --config jest.config.mjs --coverage"
   },
   "dependencies": {
     "@react-google-maps/api": "^2.20.3",
@@ -27,15 +26,7 @@
     "jest": "^29.x",
     "nodemon": "^2.x",
     "supertest": "^6.x"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "**/*.{js,jsx}",
-      "!**/node_modules/**",
-      "!**/coverage/**"
-    ],
-    "testEnvironment": "node",
-    "transform": {}
   }
 }
+
 
