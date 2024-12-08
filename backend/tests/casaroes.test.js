@@ -1,4 +1,5 @@
 import request from 'supertest';
+import app from './App.js';
 
 describe('Testes da API de Casarões', () => {
   // ... testes existentes ...
