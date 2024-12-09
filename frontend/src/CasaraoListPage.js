@@ -26,9 +26,11 @@ function CasaraoListPage({ isAdmin, onLogout }) {
     const savedComentarios = localStorage.getItem('comentarios');
     return savedComentarios ? JSON.parse(savedComentarios) : {};
   });
-  const [showInput, setShowInput] = useState(false); 
-  const [suggestion, setSuggestion] = useState(''); 
-  const [successMessage, setSuccessMessage] = useState(''); 
+  const [showInput, setShowInput] = useState(false);
+  const [suggestion, setSuggestion] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+// ... rest of the code ...
   const fetchCasaroes = async () => {
     try {
       const response = await fetch(`https://back-production-8285.up.railway.app/casaroes`);
@@ -160,14 +162,10 @@ function CasaraoListPage({ isAdmin, onLogout }) {
   };
 
   const handleAddComment = (casaraoId, comment) => {
-    setComentarios((prev) => {
-      const newComentarios = {
-        ...prev,
-        [casaraoId]: [...(prev[casaraoId] || []), comment],
-      };
-      localStorage.setItem('comentarios', JSON.stringify(newComentarios));
-      return newComentarios;
-    });
+    setComentarios((prev) => ({
+      ...prev,
+      [casaraoId]: [...(prev[casaraoId] || []), comment],
+    }));
   };
 
   return (
@@ -290,33 +288,12 @@ function CasaraoListPage({ isAdmin, onLogout }) {
                   )}
                   {!isAdmin && (
                     <>
-                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                        <button 
-                          onClick={() => handleFavoritar(casarao)} 
-                          style={styles.favoritoButton}
-                          title="Adicionar aos favoritos"
-                        >
-                          <IoIosStarOutline 
-                            style={{ 
-                              color: favoritos.some(favorito => favorito.id === casarao.id) ? 'gold' : 'gray',
-                              fontSize: '20px'
-                            }} 
-                          />
-                        </button>
-
-                        <button 
-                          onClick={() => handleMarcarVisitado(casarao)} 
-                          style={styles.visitadoButton}
-                          title="Marcar como visitado"
-                        >
-                          <IoMdCheckmarkCircleOutline 
-                            style={{ 
-                              color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray',
-                              fontSize: '20px'
-                            }} 
-                          />
-                        </button>
-                      </div>
+                      <button onClick={() => handleFavoritar(casarao)} style={styles.favoritoButton}>
+                        <IoIosStarOutline style={{ color: favoritos.some(favorito => favorito.id === casarao.id) ? 'gold' : 'gray' }} />
+                      </button>
+                      <button onClick={() => handleMarcarVisitado(casarao)} style={styles.visitadoButton}>
+                        <IoMdCheckmarkCircleOutline style={{ color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray' }} />
+                      </button>
                       
                       <div style={styles.comentariosContainer}>
                         <h4>Comentários</h4>
@@ -605,5 +582,4 @@ const styles = {
     animation: 'fadeOut 3s forwards',
   },
 };
-
 export default CasaraoListPage;
