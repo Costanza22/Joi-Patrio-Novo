@@ -22,14 +22,15 @@ function CasaraoListPage({ isAdmin, onLogout }) {
     const savedVisitados = localStorage.getItem('visitados');
     return savedVisitados ? JSON.parse(savedVisitados) : [];
   });
-   const [comentarios, setComentarios] = useState(() => {
+  const [comentarios, setComentarios] = useState(() => {
     const savedComentarios = localStorage.getItem('comentarios');
     return savedComentarios ? JSON.parse(savedComentarios) : {};
   });
-  const [comentarios, setComentarios] = useState({});
-  const [showInput, setShowInput] = useState(false); 
-  const [suggestion, setSuggestion] = useState(''); 
-  const [successMessage, setSuccessMessage] = useState(''); 
+  const [showInput, setShowInput] = useState(false);
+  const [suggestion, setSuggestion] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+// ... rest of the code ...
   const fetchCasaroes = async () => {
     try {
       const response = await fetch(`https://back-production-8285.up.railway.app/casaroes`);
