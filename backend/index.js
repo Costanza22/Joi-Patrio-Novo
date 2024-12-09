@@ -73,12 +73,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-
-// aqui voce precisa dizer se o usuario e admin ou nao
-// precisa ter um campo na tabela de usuario pra saber que tipo de usuario ele e
-//e depois, no front, voce precisa verificar que tipo de usuario ta logado. se for admin, mostra o botao, senao nao
-// sugiro usar o cursor pra ver se ajuda tambem 
-
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
 
@@ -156,11 +150,6 @@ app.post('/login', (req, res) => {
   });
 });
 
-
-// Na hora de cadastrar, voce precisa passar o ID do usuario que ta logado e salvar esse ID pra cada casarao
-// aqui na hora de listar, voce precisa receber o ID do usuario tambem e filtrar (where userId === tal)
-// por isso qualquer um consegue ver todos, agora. 
-// voce nao ta filtrando essa lista
 
 app.post('/casaroes', (req, res) => { // Verifica se `date` está presente no corpo da requisição
   const {formData, base64}= req.body;
@@ -262,6 +251,100 @@ app.delete('/casaroes/:id', (req, res) => {
     }
 
     res.status(200).json({ message: 'Casarão excluído com sucesso' });
+  });
+});
+
+// Rota para adicionar favorito
+app.post('/favorites', (req, res) => {
+  const { userId, casaraoId } = req.body;
+  
+  const sql = 'INSERT INTO favorites (user_id, casarao_id) VALUES (?, ?)';
+  db.query(sql, [userId, casaraoId], (err, result) => {
+    if (err) {
+      console.error('Erro ao adicionar favorito:', err);
+      return res.status(500).json({ error: 'Erro ao adicionar favorito' });
+    }
+    res.status(201).json({ message: 'Favorito adicionado com sucesso' });
+  });
+});
+
+// Rota para remover favorito
+app.delete('/favorites', (req, res) => {
+  const { userId, casaraoId } = req.body;
+  
+  const sql = 'DELETE FROM favorites WHERE user_id = ? AND casarao_id = ?';
+  db.query(sql, [userId, casaraoId], (err, result) => {
+    if (err) {
+      console.error('Erro ao remover favorito:', err);
+      return res.status(500).json({ error: 'Erro ao remover favorito' });
+    }
+    res.status(200).json({ message: 'Favorito removido com sucesso' });
+  });
+});
+
+// Rota para adicionar visitado
+app.post('/visited', (req, res) => {
+  const { userId, casaraoId, visitDate } = req.body;
+  
+  const sql = 'INSERT INTO visited (user_id, casarao_id, visit_date) VALUES (?, ?, ?)';
+  db.query(sql, [userId, casaraoId, visitDate || new Date()], (err, result) => {
+    if (err) {
+      console.error('Erro ao adicionar visita:', err);
+      return res.status(500).json({ error: 'Erro ao adicionar visita' });
+    }
+    res.status(201).json({ message: 'Visita registrada com sucesso' });
+  });
+});
+
+// Rota para remover visitado
+app.delete('/visited', (req, res) => {
+  const { userId, casaraoId } = req.body;
+  
+  const sql = 'DELETE FROM visited WHERE user_id = ? AND casarao_id = ?';
+  db.query(sql, [userId, casaraoId], (err, result) => {
+    if (err) {
+      console.error('Erro ao remover visita:', err);
+      return res.status(500).json({ error: 'Erro ao remover visita' });
+    }
+    res.status(200).json({ message: 'Visita removida com sucesso' });
+  });
+});
+
+// Melhorar a rota de user-data para incluir visitados
+app.get('/user-data/:userId', (req, res) => {
+  const { userId } = req.params;
+  const data = {};
+  
+  // Busca favoritos
+  const favoritesQuery = 'SELECT c.* FROM casaroes c JOIN favorites f ON c.id = f.casarao_id WHERE f.user_id = ?';
+  
+  // Busca visitados
+  const visitedQuery = 'SELECT c.*, v.visit_date FROM casaroes c JOIN visited v ON c.id = v.casarao_id WHERE v.user_id = ?';
+  
+  // Executa as queries em paralelo
+  Promise.all([
+    new Promise((resolve, reject) => {
+      db.query(favoritesQuery, [userId], (err, favorites) => {
+        if (err) reject(err);
+        else resolve(favorites);
+      });
+    }),
+    new Promise((resolve, reject) => {
+      db.query(visitedQuery, [userId], (err, visited) => {
+        if (err) reject(err);
+        else resolve(visited);
+      });
+    })
+  ])
+  .then(([favorites, visited]) => {
+    res.json({
+      favorites,
+      visited
+    });
+  })
+  .catch(err => {
+    console.error('Erro ao buscar dados do usuário:', err);
+    res.status(500).json({ error: 'Erro ao buscar dados do usuário' });
   });
 });
 

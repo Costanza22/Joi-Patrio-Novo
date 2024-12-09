@@ -1,4 +1,4 @@
-describe('Teste da API de Casarões', () => {
+export default describe('Teste da API de Casarões', () => {
   test('deve rejeitar casarão com nome muito curto', () => {
     const novoCasarao = {
       formData: {

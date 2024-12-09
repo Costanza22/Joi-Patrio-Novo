@@ -2,5 +2,12 @@ export default {
   collectCoverage: true,
   coverageDirectory: "coverage",
   coverageReporters: ["lcov", "text"],
-  // ... outras configurações existentes
-} 
+  testEnvironment: 'node',
+  transform: {},
+  reporters: [
+    'default',
+    ['jest-html-reporter', {
+      pageTitle: 'Test Report'
+    }]
+  ]
+}; 
