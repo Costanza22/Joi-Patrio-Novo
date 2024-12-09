@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import CasaraoFormPage from './CasaraoFormPage';
-import { MdOutlineModeEdit } from 'react-icons/md';
+import { MdOutlineModeEdit, MdOutlineExitToApp } from 'react-icons/md';
 import { IoIosStarOutline, IoMdCheckmarkCircleOutline } from 'react-icons/io';
 import { BsFillPatchQuestionFill } from 'react-icons/bs';
 
 
-function CasaraoListPage({ isAdmin }) {
+function CasaraoListPage({ isAdmin, onLogout }) {
+  console.log('CasaraoListPage - isAdmin:', isAdmin);
+  console.log('localStorage isAdmin:', localStorage.getItem('isAdmin'));
+
   const [casaroes, setCasaroes] = useState([]);
   const [showCadastro, setShowCadastro] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -19,7 +22,10 @@ function CasaraoListPage({ isAdmin }) {
     const savedVisitados = localStorage.getItem('visitados');
     return savedVisitados ? JSON.parse(savedVisitados) : [];
   });
-  const [comentarios, setComentarios] = useState({});
+  const [comentarios, setComentarios] = useState(() => {
+    const savedComentarios = localStorage.getItem('comentarios');
+    return savedComentarios ? JSON.parse(savedComentarios) : {};
+  });
   const [showInput, setShowInput] = useState(false); 
   const [suggestion, setSuggestion] = useState(''); 
   const [successMessage, setSuccessMessage] = useState(''); 
@@ -154,172 +160,216 @@ function CasaraoListPage({ isAdmin }) {
   };
 
   const handleAddComment = (casaraoId, comment) => {
-    setComentarios((prev) => ({
-      ...prev,
-      [casaraoId]: [...(prev[casaraoId] || []), comment],
-    }));
+    setComentarios((prev) => {
+      const newComentarios = {
+        ...prev,
+        [casaraoId]: [...(prev[casaraoId] || []), comment],
+      };
+      localStorage.setItem('comentarios', JSON.stringify(newComentarios));
+      return newComentarios;
+    });
   };
 
   return (
     <div style={styles.container}>
-      {showCadastro ? (
-        <CasaraoFormPage 
-          onSubmit={handleCasaraoSubmit} 
-          casaraoData={casaraoToEdit}
-        />
-      ) : (
-        <>
-          <h2 style={styles.title}>
-            Lista de Casarões
-            {!isAdmin && (
-              <BsFillPatchQuestionFill 
-                onClick={handleIconClick} 
-                style={styles.suggestionIcon} 
-                title="Sugerir um casarão"
-              />
-            )}
-          </h2>
-
-          {showInput && !isAdmin && (
-            <div style={styles.suggestionContainer}>
-              <h3 style={styles.suggestionTitle}>Sugerir um Casarão</h3>
-              <p style={styles.suggestionText}>
-                Conhece algum casarão histórico que deveria estar em nossa lista? 
-                Compartilhe conosco!
-              </p>
-              <form onSubmit={handleSubmit} style={styles.suggestionForm}>
-                <textarea
-                  value={suggestion}
-                  onChange={(e) => setSuggestion(e.target.value)}
-                  placeholder="Descreva o casarão e sua localização..."
-                  style={styles.suggestionInput}
-                />
-                <button type="submit" style={styles.suggestionButton}>
-                  Enviar Sugestão
-                </button>
-              </form>
-            </div>
-          )}
-
-          {successMessage && (
-            <div style={styles.successMessageContainer}>
-              <p style={styles.successMessage}>{successMessage}</p>
-            </div>
-          )}
-          
-          <button onClick={handleConsultarClick} style={styles.button}>
-            {showList ? 'Fechar Casarões' : 'Consultar Casarões'}
-          </button>
-          {isAdmin && (
-            <button onClick={handleCadastroClick} style={styles.button}>
-              Cadastrar Novo Casarão
-            </button>
-          )}
-          {showList && (
-            <div style={styles.listContainer}>
-              {error && <div style={{ color: 'red' }}>{error}</div>}
-              {casaroes.length > 0 ? (
-                <ul style={styles.list}>
-                  {casaroes.map((casarao) => (
-                    <li key={casarao.id} style={styles.listItem}>
-                      <h3>{casarao.name}</h3>
-                      <p>{casarao.description}</p>
-                      <p>{casarao.location}</p>
-                      <p>Data: {casarao.date ? casarao.date.split('T')[0] : 'Data não disponível'}</p>
-
-
-
-                      {casarao.image_path && (
-  <div style={styles.imageContainer}>
-    <img
-      src={`data:image/jpeg;base64,${casarao.image_path}`}
-      alt={casarao.name}
-      onError={(e) => {
-        console.error('Erro ao carregar a imagem:', e);
-      }}
-      style={styles.image}
-    />
-  </div>
-
-
-
-                      )}
-                      <button onClick={handleSortByName} style={styles.button}>Ordenar por Nome</button>
-<button onClick={handleFilterVisitados} style={styles.button}>Filtrar Visitados</button>
-
-                      {isAdmin && (
-                        <>
-                          <button onClick={() => handleEditClick(casarao)} style={styles.editButton}>
-                            <MdOutlineModeEdit /> Editar
-                          </button>
-                          <button onClick={() => handleDeleteCasarao(casarao.id)} style={styles.deleteButton}>
-                            Excluir
-                          </button>
-                        </>
-                      )}
-                      {!isAdmin && (
-                        <>
-                          <button onClick={() => handleFavoritar(casarao)} style={styles.favoritoButton}>
-                            <IoIosStarOutline style={{ color: favoritos.some(favorito => favorito.id === casarao.id) ? 'gold' : 'gray' }} />
-                          </button>
-                          <button onClick={() => handleMarcarVisitado(casarao)} style={styles.visitadoButton}>
-                            <IoMdCheckmarkCircleOutline style={{ color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray' }} />
-                          </button>
-                          
-                          <div style={styles.comentariosContainer}>
-                            <h4>Comentários</h4>
-                            <ul>
-                              {(comentarios[casarao.id] || []).map((comment) => (
-                                <li key={`${casarao.id}-${comment}`}>{comment}</li>
-                              ))}
-                            </ul>
-                            <input
-                              type="text"
-                              placeholder="Adicionar um comentário"
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' && e.target.value.trim()) {
-                                  handleAddComment(casarao.id, e.target.value);
-                                  e.target.value = '';
-                                }
-                              }}
-                              style={styles.comentarioInput}
-                            />
-                          </div>
-                        </>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>Nenhum casarão cadastrado.</p>
-              )}
-            </div>
-          )}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '20px',
+        position: 'relative',
+        width: '100%'
+      }}>
+        <h2 style={styles.title}>
+          Lista de Casarões
           {!isAdmin && (
-            <div style={styles.favoritosContainer}>
-              <h3>Favoritos</h3>
-              <ul>
-                {favoritos.length > 0 ? (
-                  favoritos.map(favorito => (
-                    <li key={favorito.id}>{favorito.name}</li>
-                  ))
-                ) : (
-                  <p>Nenhum favorito adicionado.</p>
-                )}
-              </ul>
-              <h3>Visitados</h3>
-              <ul>
-                {visitados.length > 0 ? (
-                  visitados.map(visitado => (
-                    <li key={visitado.id}>{visitado.name}</li>
-                  ))
-                ) : (
-                  <p>Nenhum casarão visitado.</p>
-                )}
-              </ul>
-            </div>
+            <BsFillPatchQuestionFill 
+              onClick={handleIconClick} 
+              style={styles.suggestionIcon} 
+              title="Sugerir um casarão"
+            />
           )}
-        </>
+        </h2>
+        <button 
+          onClick={onLogout} 
+          style={{
+            position: 'absolute',
+            right: '20px',
+            backgroundColor: '#8B4513',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '10px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '18px'
+          }}
+        >
+          <MdOutlineExitToApp size={24} /> Sair
+        </button>
+      </div>
+
+      {showInput && !isAdmin && (
+        <div style={styles.suggestionContainer}>
+          <h3 style={styles.suggestionTitle}>Sugerir um Casarão</h3>
+          <p style={styles.suggestionText}>
+            Conhece algum casarão histórico que deveria estar em nossa lista? 
+            Compartilhe conosco!
+          </p>
+          <form onSubmit={handleSubmit} style={styles.suggestionForm}>
+            <textarea
+              value={suggestion}
+              onChange={(e) => setSuggestion(e.target.value)}
+              placeholder="Descreva o casarão e sua localização..."
+              style={styles.suggestionInput}
+            />
+            <button type="submit" style={styles.suggestionButton}>
+              Enviar Sugestão
+            </button>
+          </form>
+        </div>
+      )}
+
+      {successMessage && (
+        <div style={styles.successMessageContainer}>
+          <p style={styles.successMessage}>{successMessage}</p>
+        </div>
+      )}
+      
+      <button onClick={handleConsultarClick} style={styles.button}>
+        {showList ? 'Fechar Casarões' : 'Consultar Casarões'}
+      </button>
+      {isAdmin && (
+        <button onClick={handleCadastroClick} style={styles.button}>
+          Cadastrar Novo Casarão
+        </button>
+      )}
+      {showList && (
+        <div style={styles.listContainer}>
+          {error && <div style={{ color: 'red' }}>{error}</div>}
+          {casaroes.length > 0 ? (
+            <ul style={styles.list}>
+              {casaroes.map((casarao) => (
+                <li key={casarao.id} style={styles.listItem}>
+                  <h3>{casarao.name}</h3>
+                  <p>{casarao.description}</p>
+                  <p>{casarao.location}</p>
+                  <p>Data: {casarao.date ? casarao.date.split('T')[0] : 'Data não disponível'}</p>
+
+
+
+                  {casarao.image_path && (
+    <div style={styles.imageContainer}>
+      <img
+        src={`data:image/jpeg;base64,${casarao.image_path}`}
+        alt={casarao.name}
+        onError={(e) => {
+          console.error('Erro ao carregar a imagem:', e);
+        }}
+        style={styles.image}
+      />
+    </div>
+
+
+
+                  )}
+                  <button onClick={handleSortByName} style={styles.button}>Ordenar por Nome</button>
+  <button onClick={handleFilterVisitados} style={styles.button}>Filtrar Visitados</button>
+
+                  {isAdmin && (
+                    <>
+                      <button onClick={() => handleEditClick(casarao)} style={styles.editButton}>
+                        <MdOutlineModeEdit /> Editar
+                      </button>
+                      <button onClick={() => handleDeleteCasarao(casarao.id)} style={styles.deleteButton}>
+                        Excluir
+                      </button>
+                    </>
+                  )}
+                  {!isAdmin && (
+                    <>
+                      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <button 
+                          onClick={() => handleFavoritar(casarao)} 
+                          style={styles.favoritoButton}
+                          title="Adicionar aos favoritos"
+                        >
+                          <IoIosStarOutline 
+                            style={{ 
+                              color: favoritos.some(favorito => favorito.id === casarao.id) ? 'gold' : 'gray',
+                              fontSize: '20px'
+                            }} 
+                          />
+                        </button>
+
+                        <button 
+                          onClick={() => handleMarcarVisitado(casarao)} 
+                          style={styles.visitadoButton}
+                          title="Marcar como visitado"
+                        >
+                          <IoMdCheckmarkCircleOutline 
+                            style={{ 
+                              color: visitados.some(visitado => visitado.id === casarao.id) ? 'green' : 'gray',
+                              fontSize: '20px'
+                            }} 
+                          />
+                        </button>
+                      </div>
+                      
+                      <div style={styles.comentariosContainer}>
+                        <h4>Comentários</h4>
+                        <ul>
+                          {(comentarios[casarao.id] || []).map((comment) => (
+                            <li key={`${casarao.id}-${comment}`}>{comment}</li>
+                          ))}
+                        </ul>
+                        <input
+                          type="text"
+                          placeholder="Adicionar um comentário"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.target.value.trim()) {
+                              handleAddComment(casarao.id, e.target.value);
+                              e.target.value = '';
+                            }
+                          }}
+                          style={styles.comentarioInput}
+                        />
+                      </div>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Nenhum casarão cadastrado.</p>
+          )}
+        </div>
+      )}
+      {!isAdmin && (
+        <div style={styles.favoritosContainer}>
+          <h3>Favoritos</h3>
+          <ul>
+            {favoritos.length > 0 ? (
+              favoritos.map(favorito => (
+                <li key={favorito.id}>{favorito.name}</li>
+              ))
+            ) : (
+              <p>Nenhum favorito adicionado.</p>
+            )}
+          </ul>
+          <h3>Visitados</h3>
+          <ul>
+            {visitados.length > 0 ? (
+              visitados.map(visitado => (
+                <li key={visitado.id}>{visitado.name}</li>
+              ))
+            ) : (
+              <p>Nenhum casarão visitado.</p>
+            )}
+          </ul>
+        </div>
       )}
     </div>
     
