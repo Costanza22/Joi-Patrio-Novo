@@ -368,10 +368,16 @@ function CasaraoListPage({ isAdmin, onLogout }) {
                 <li key={visitado.id}>{visitado.name}</li>
               ))
             ) : (
-              <p>Nenhum casarão visitado.</p>
+             <p>Nenhum casarão visitado.</p>
             )}
           </ul>
         </div>
+      )}
+      {showCadastro && (
+        <CasaraoFormPage 
+          onSubmit={handleCasaraoSubmit} 
+          casaraoData={casaraoToEdit} 
+        />
       )}
     </div>
     
