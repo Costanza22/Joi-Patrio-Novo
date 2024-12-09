@@ -30,6 +30,7 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.26.3",
     "sonar-scanner": "^3.1.0"

@@ -1,16 +1,26 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import CasaraoFormPage from './CasaraoFormPage';
+import CasaraoFormPage from '../CasaraoFormPage';
 
 describe('CasaraoFormPage Component', () => {
+  let renderCasaraoForm;
   const mockOnSubmit = jest.fn();
+
+  beforeEach(() => {
+    renderCasaraoForm = async (props = {}) => {
+      render(<CasaraoFormPage onSubmit={mockOnSubmit} {...props} />);
+      await waitFor(() => {
+        expect(screen.getByPlaceholderText('Nome do Casarão')).toBeInTheDocument();
+      });
+    };
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  test('renders the form with initial empty fields', () => {
-    render(<CasaraoFormPage onSubmit={mockOnSubmit} />);
+  test('renders the form with initial empty fields', async () => {
+    await renderCasaraoForm();
 
     expect(screen.getByPlaceholderText('Nome do Casarão')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Descrição do Casarão')).toBeInTheDocument();
@@ -19,8 +29,8 @@ describe('CasaraoFormPage Component', () => {
     expect(screen.getByPlaceholderText('Data de Construção')).toBeInTheDocument();
   });
 
-  test('updates the name field on user input', () => {
-    render(<CasaraoFormPage onSubmit={mockOnSubmit} />);
+  test('updates the name field on user input', async () => {
+    await renderCasaraoForm();
     const nameInput = screen.getByPlaceholderText('Nome do Casarão');
 
     fireEvent.change(nameInput, { target: { value: 'Casarão Histórico' } });
