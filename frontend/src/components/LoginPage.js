@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { BiExit } from 'react-icons/bi';
+import { FaHouseFlag } from "react-icons/fa6";
 import axios from 'axios';
 
 const commonStyles = {
@@ -311,8 +312,9 @@ function LoginForm({
           alignItems: 'center',
           flex: 1
         }}>
-          <h2 style={{...styles.title, margin: 0}}>Bem-vindo ao JoiPatrio</h2>
-          <p style={{...styles.subtitle, margin: '5px 0 0 0'}}>Consultar Casarões</p>
+          <h2 style={{...styles.title, margin: 0}}>
+            Bem-vindo ao JoiPatrio <FaHouseFlag />
+          </h2>
         </div>
         <a 
           href="https://joi-patrio.vercel.app/"
