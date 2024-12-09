@@ -11,7 +11,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.config.mjs",
-    "coverage": "jest --coverage"
+    "coverage": "npx jest --coverage"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +30,8 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
     "sonar-scanner": "^3.1.0"
   }
 }
