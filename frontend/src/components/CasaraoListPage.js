@@ -373,6 +373,12 @@ function CasaraoListPage({ isAdmin, onLogout }) {
           </ul>
         </div>
       )}
+      {showCadastro && (
+        <CasaraoFormPage 
+          onSubmit={handleCasaraoSubmit} 
+          casaraoData={casaraoToEdit} 
+        />
+      )}
     </div>
     
   );
