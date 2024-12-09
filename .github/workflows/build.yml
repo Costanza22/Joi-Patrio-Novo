@@ -18,9 +18,11 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
+        working-directory: ./backend
         run: npm install
 
       - name: Run tests
+        working-directory: ./backend
         run: npm test
 
       - name: Run SonarCloud scanner
