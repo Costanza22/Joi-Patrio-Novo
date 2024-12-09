@@ -108,15 +108,6 @@ Front-end: React, para a criação de uma interface de usuário dinâmica e resp
 
 Banco de Dados: MySQL, para o armazenamento de informações sobre os casarões.
 
-## Projeto
-O Projeto foi separado em dois repositórios
-
-A página principal é esse e a parte de login é esse 
-
-https://github.com/Costanza22/joinville-version
-
-Para melhor organização!
-
 ## Benefícios
 Manutenção Facilitada: Código organizado e de fácil evolução.
 
@@ -134,27 +125,6 @@ Frontend (React): Executado em um contêiner e acessível através de http://loc
 Backend (Node.js): Executado em outro contêiner, acessível via http://localhost:5001.
 
 Banco de Dados (MySQL): Contêiner isolado, acessível através de http://localhost:5000.
-
-## Instruções para Rodar o Projeto
-
-Clonar o repositório:
-
-git clone https://github.com/Costanza22/joinville-version
-
-cd joinville-version
-
-Construir e rodar os contêineres com Docker Compose:
-
-docker-compose up --build
-
-## Acessar a aplicação
-Frontend: http://localhost:4000
-
-Backend: http://localhost:5001
-
-Banco de Dados: Acessível na porta 5000 (para conexão com o backend).
-
-## Como Funciona
 
 # Joi Patrio - Monitoramento de Performance com New Relic
 
@@ -198,7 +168,7 @@ Facilidade de configuração: O projeto pode ser iniciado com um único comando,
 
 
 ## Ferramenta de Análise de código : SonarQube
-https://sonarcloud.io/summary/new_code?id=Costanza22_joinville-version
+[https://sonarcloud.io/summary/new_code?id=Costanza22_joinville-version](https://sonarcloud.io/project/overview?id=Costanza22_Joi-Patrio-Novo)
 
 ## Conclusão
 O projeto Joi Patrio não apenas busca registrar a rica história dos casarões de Joinville, mas também fomentar a consciência sobre a importância da preservação do patrimônio histórico. Através de uma plataforma acessível e interativa, espera-se envolver a comunidade e os visitantes, promovendo um maior apreço pela herança cultural da cidade.
