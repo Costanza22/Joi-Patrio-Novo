@@ -25,23 +25,12 @@
     "axios": "^1.7.9",
     "babel-jest": "^29.x",
     "jest": "^29.7.0",
-    "jest-html-reporter": "^3.10.2",
     "nodemon": "^2.x",
     "supertest": "^6.3.4"
   },
   "jest": {
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
-    },
-    "reporters": [
-      "default",
-      [
-        "jest-html-reporter",
-        {
-          "pageTitle": "Test Report",
-          "outputPath": "test-report.html"
-        }
-      ]
-    ]
+    }
   }
 }
