@@ -136,7 +136,7 @@ Em uma **futura implementação**, o projeto oferecerá uma funcionalidade de **
 ---
 
 ## 📌 **Ferramentas Adicionais**  
-- **SonarQube**: [Análise de Código](https://sonarcloud.io/summary/new_code?id=Costanza22_joinville-version)  
+**SonarQube**: [Visão Geral do Projeto](https://sonarcloud.io/project/overview?id=Costanza22_Joi-Patrio-Novo)
 - **Trello**: [Planejamento do Projeto](https://trello.com/b/tn4lqws7/joipatrio)  
 
 ---
