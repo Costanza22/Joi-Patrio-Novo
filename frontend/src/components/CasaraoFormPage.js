@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 
 function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [cep, setCep] = useState('');
-  const [image, setImage] = useState(null);
+  const [image,setImage] = useState(null);
   const [date, setDate] = useState('');
-  const [base64, setBase64] = useState('');
-  const [mapPosition, setMapPosition] = useState(null);
+  const [base64, setBase64] = useState("");
 
   useEffect(() => {
     if (casaraoData) {
@@ -20,7 +16,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
       setLocation(casaraoData.location);
       setCep(casaraoData.cep || '');
       setImage(casaraoData.image_path ? casaraoData.image_path : null);
-      setDate(casaraoData.date || '');
+      setDate(casaraoData.date || ''); // Simplificado
+
     }
   }, [casaraoData]);
 
@@ -29,20 +26,13 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
 
     if (e.target.value.length === 8) {
       try {
+        // Primeiro, busca o endereço pelo CEP usando ViaCEP
         const response = await fetch(`https://viacep.com.br/ws/${e.target.value}/json/`);
         const data = await response.json();
 
         if (data.localidade) {
           const endereco = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
           setLocation(endereco);
-
-          const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${endereco}`);
-          const geocodeData = await geocodeResponse.json();
-
-          if (geocodeData.length > 0) {
-            const { lat, lon } = geocodeData[0];
-            setMapPosition([lat, lon]);
-          }
         }
       } catch (error) {
         console.error('Erro ao buscar CEP ou coordenadas:', error);
@@ -51,33 +41,39 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   };
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
+    const file = event.target.files[0]; // Get the uploaded file
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        const base64String = reader.result.split(',')[1];
-        setBase64(base64String);
+        const base64String = reader.result.split(",")[1]; // Remove the data type prefix
+        setBase64(base64String); // Save Base64 string in state
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Read the file as a Data URL
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Log para debug
+    console.log('Data selecionada:', date);
+
     let data = {
       name,
       description,
       location,
       cep,
-      date: date || null,
-    };
+      date: date || null, // Simplificando o envio da data
+    }
+
+    // Log para debug
+    console.log('Dados sendo enviados:', data);
 
     if (casaraoData?.id) {
       data.id = casaraoData.id;
     }
 
-    onSubmit({ formData: data, base64 });
+    onSubmit({formData: data, base64});
 
     // Reset form after submit
     setName('');
@@ -86,8 +82,7 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     setCep('');
     setDate('');
     setImage(null);
-    setBase64('');
-    setMapPosition(null);
+    setBase64("");
   };
 
   return (
@@ -156,28 +151,10 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
           {casaraoData ? 'Salvar Alterações' : 'Cadastrar'}
         </button>
       </form>
-      {mapPosition && (
-        <MapContainer
-          center={mapPosition}
-          zoom={13}
-          style={{ width: '100%', height: '300px' }}
-          zoomControl={false}
-          scrollWheelZoom={false}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <Marker position={mapPosition}>
-            <Popup>
-              {location}
-            </Popup>
-          </Marker>
-        </MapContainer>
-      )}
     </div>
   );
 }
+
 
 const styles = {
   container: {
@@ -255,9 +232,8 @@ const styles = {
     maxWidth: '200px', 
     height: 'auto',
   },
- 
+
 };
 
 export default CasaraoFormPage;
-
 
