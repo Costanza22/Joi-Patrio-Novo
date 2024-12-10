@@ -21,9 +21,17 @@ describe('API Endpoints', () => {
   let db;
   let server;
 
+  const mockQuery = (responses) => {
+    // Helper function to mock the queries
+    responses.forEach((response, index) => {
+      db.query.mockImplementationOnce((sql, params, callback) => {
+        callback(null, response);
+      });
+    });
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    // Simplificar a criação da conexão - não precisa de configurações reais
     db = mysql.createConnection();
     server = app.listen(0);
   });
@@ -45,13 +53,7 @@ describe('API Endpoints', () => {
         password: 'password123'
       };
 
-      db.query.mockImplementationOnce((sql, params, callback) => {
-        callback(null, []);
-      });
-
-      db.query.mockImplementationOnce((sql, params, callback) => {
-        callback(null, { insertId: 1 });
-      });
+      mockQuery([[], { insertId: 1 }]);
 
       const response = await request(app)
         .post('/register')
@@ -71,13 +73,9 @@ describe('API Endpoints', () => {
 
       const hashedPassword = await bcrypt.hash(mockUser.password, 10);
 
-      db.query.mockImplementationOnce((sql, params, callback) => {
-        callback(null, [{
-          id: 1,
-          username: mockUser.username,
-          password: hashedPassword
-        }]);
-      });
+      mockQuery([[
+        { id: 1, username: mockUser.username, password: hashedPassword }
+      ]]);
 
       const response = await request(app)
         .post('/login')
@@ -101,9 +99,7 @@ describe('API Endpoints', () => {
         }
       ];
 
-      db.query.mockImplementationOnce((sql, callback) => {
-        callback(null, mockCasaroes);
-      });
+      mockQuery([mockCasaroes]);
 
       const response = await request(app)
         .get('/casaroes');
@@ -127,9 +123,7 @@ describe('API Endpoints', () => {
         base64: 'data:image/jpeg;base64,/9j/4AAQSkZJRg=='
       };
 
-      db.query.mockImplementationOnce((sql, params, callback) => {
-        callback(null, { insertId: 1 });
-      });
+      mockQuery([{ insertId: 1 }]);
 
       const response = await request(app)
         .post('/casaroes')
@@ -139,4 +133,4 @@ describe('API Endpoints', () => {
       expect(response.body).toHaveProperty('id');
     });
   });
-}); 
+});
