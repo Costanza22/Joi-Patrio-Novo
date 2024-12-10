@@ -19,32 +19,16 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies - Backend
+      - name: Install dependencies
         working-directory: ./backend
         run: npm install
 
-      - name: Run tests with coverage - Backend
+      - name: Run tests with coverage
         working-directory: ./backend
         run: npm run coverage
         continue-on-error: true
 
-      - name: SonarQube Scan - Backend
-        uses: SonarSource/sonarqube-scan-action@v4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-      # Adicionando as etapas para o frontend
-      - name: Install dependencies - Frontend
-        working-directory: ./frontend
-        run: npm install
-
-      - name: Run tests with coverage - Frontend
-        working-directory: ./frontend
-        run: npm run coverage
-        continue-on-error: true
-
-      - name: SonarQube Scan - Frontend
+      - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
