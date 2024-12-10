@@ -346,3 +346,6 @@ app.get('/user-data/:userId', (req, res) => {
 export { app };
 
 // Inicia o servidor
+app.listen(5000, () => {
+  console.log('Servidor rodando');
+});
