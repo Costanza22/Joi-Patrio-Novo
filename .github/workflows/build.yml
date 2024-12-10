@@ -20,9 +20,10 @@ jobs:
           java-version: '17' # ajuste para sua versão do Java
           distribution: 'temurin'
 
-      - name: Run Tests
-        run: mvn test
-        continue-on-error: true # Permite continuar mesmo se os testes falharem
+      - name: Build and Run Tests
+        working-directory: ./backend
+        run: mvn clean verify
+        continue-on-error: true
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
