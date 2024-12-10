@@ -4,7 +4,6 @@ import { MdOutlineModeEdit, MdOutlineExitToApp } from 'react-icons/md';
 import { IoIosStarOutline, IoMdCheckmarkCircleOutline } from 'react-icons/io';
 import { BsFillPatchQuestionFill } from 'react-icons/bs';
 
-
 function CasaraoListPage({ isAdmin, onLogout }) {
   console.log('CasaraoListPage - isAdmin:', isAdmin);
   console.log('localStorage isAdmin:', localStorage.getItem('isAdmin'));
@@ -22,14 +21,14 @@ function CasaraoListPage({ isAdmin, onLogout }) {
     const savedVisitados = localStorage.getItem('visitados');
     return savedVisitados ? JSON.parse(savedVisitados) : [];
   });
-   const [comentarios, setComentarios] = useState(() => {
+  const [comentarios, setComentarios] = useState(() => {
     const savedComentarios = localStorage.getItem('comentarios');
     return savedComentarios ? JSON.parse(savedComentarios) : {};
   });
-  const [comentarios, setComentarios] = useState({});
   const [showInput, setShowInput] = useState(false); 
   const [suggestion, setSuggestion] = useState(''); 
   const [successMessage, setSuccessMessage] = useState(''); 
+
   const fetchCasaroes = async () => {
     try {
       const response = await fetch(`https://back-production-8285.up.railway.app/casaroes`);
