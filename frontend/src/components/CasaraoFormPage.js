@@ -3,8 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-
-
 function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -12,11 +10,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [cep, setCep] = useState('');
   const [image, setImage] = useState(null);
   const [date, setDate] = useState('');
-
   const [base64, setBase64] = useState('');
   const [mapPosition, setMapPosition] = useState(null);
-
-
 
   useEffect(() => {
     if (casaraoData) {
@@ -41,8 +36,6 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
           const endereco = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
           setLocation(endereco);
 
-
-          // Fetch coordinates using a geocoding service
           const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${endereco}`);
           const geocodeData = await geocodeResponse.json();
 
@@ -50,7 +43,6 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
             const { lat, lon } = geocodeData[0];
             setMapPosition([lat, lon]);
           }
-
         }
       } catch (error) {
         console.error('Erro ao buscar CEP ou coordenadas:', error);
@@ -78,16 +70,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
       description,
       location,
       cep,
-
       date: date || null,
     };
-
-      date: date || null, // Simplificando o envio da data
-    }
-
-    // Log para debug
-    console.log('Dados sendo enviados:', data);
->>>>>>> 42d7a905293c20ecb4853fc0f6681ed59b46ef85
 
     if (casaraoData?.id) {
       data.id = casaraoData.id;
@@ -102,12 +86,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     setCep('');
     setDate('');
     setImage(null);
-<<<<<<< HEAD
     setBase64('');
     setMapPosition(null);
-=======
-    setBase64("");
->>>>>>> 42d7a905293c20ecb4853fc0f6681ed59b46ef85
   };
 
   return (
@@ -199,7 +179,6 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   );
 }
 
-
 const styles = {
   container: {
     padding: '20px',
@@ -280,8 +259,5 @@ const styles = {
 };
 
 export default CasaraoFormPage;
-
-
-
 
 
