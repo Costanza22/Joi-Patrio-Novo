@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import CasaraoFormPage from ./CasaraoFormPage.test.js
+import CasaraoFormPage from './CasaraoFormPage.test.js'
 
 describe('CasaraoFormPage', () => {
   const mockOnSubmit = jest.fn();
