@@ -10,23 +10,7 @@ import jwt from 'jsonwebtoken';
 const app = express();
 const server = app.listen(process.env.PORT || 3000);
 
-
-// Configuração mais permissiva do CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  next();
-});
-
-// Mantenha também a configuração do cors
+// Configuração do CORS mais específica
 app.use(cors({
   origin: 'https://joinville-version.vercel.app/',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -34,13 +18,12 @@ app.use(cors({
   credentials: true
 }));
 
-
 app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({limit: '10mb', extended: true}));
-app.use(cors());
 
 // Servir arquivos estáticos da pasta 'uploads'
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 
 // Conexão ao banco de dados MySQL
 const db = mysql.createConnection({
