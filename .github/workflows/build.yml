@@ -21,12 +21,14 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
-        working-directory: ./frontend
+        run: |
+          cd frontend
+          npm install
 
       - name: Run tests with coverage
-        run: npm run coverage
-        working-directory: ./frontend
+        run: |
+          cd frontend
+          npm run coverage
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
