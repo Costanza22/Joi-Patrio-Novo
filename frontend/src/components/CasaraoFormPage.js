@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [name, setName] = useState('');
@@ -10,8 +8,10 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
   const [cep, setCep] = useState('');
   const [image, setImage] = useState(null);
   const [date, setDate] = useState('');
-  const [base64, setBase64] = useState('');
-  const [mapPosition, setMapPosition] = useState(null);
+  const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
+  const [loadingMap, setLoadingMap] = useState(false); // State for loading map
+  const [base64, setBase64] = useState("");
+  const [mapKey, setMapKey] = useState(0); // State for forcing re-render of map
 
   useEffect(() => {
     if (casaraoData) {
@@ -36,13 +36,24 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
           const endereco = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
           setLocation(endereco);
 
-          // Fetch coordinates using a geocoding service
-          const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${endereco}`);
-          const geocodeData = await geocodeResponse.json();
+          // Agora usa Nominatim para obter as coordenadas
+          const nominatimResponse = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&limit=1`,
+            {
+              headers: {
+                'Accept-Language': 'pt-BR',
+                'User-Agent': 'CasaraoApp/1.0' // É boa prática identificar sua aplicação
+              }
+            }
+          );
+          const nominatimData = await nominatimResponse.json();
 
-          if (geocodeData.length > 0) {
-            const { lat, lon } = geocodeData[0];
-            setMapPosition([lat, lon]);
+          if (nominatimData.length > 0) {
+            setCoordinates({
+              lat: parseFloat(nominatimData[0].lat),
+              lng: parseFloat(nominatimData[0].lon)
+            });
+            setMapKey(prev => prev + 1); // Força o re-render do mapa
           }
         }
       } catch (error) {
@@ -71,8 +82,13 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
       description,
       location,
       cep,
-      date: date || null,
-    };
+      date: date || null, // Simplificando o envio da data
+      latitude: coordinates.lat,
+      longitude: coordinates.lng
+    }
+
+    // Log para debug
+    console.log('Dados sendo enviados:', data);
 
     if (casaraoData?.id) {
       data.id = casaraoData.id;
@@ -87,8 +103,8 @@ function CasaraoFormPage({ onSubmit, casaraoData }) {
     setCep('');
     setDate('');
     setImage(null);
-    setBase64('');
-    setMapPosition(null);
+    setBase64("");
+    setCoordinates({ lat: null, lng: null });
   };
 
   return (
@@ -261,4 +277,5 @@ const styles = {
 };
 
 export default CasaraoFormPage;
+
 

@@ -34,5 +34,15 @@
     "nyc": "^17.1.0",
     "sonarqube-scanner": "^4.2.6",
     "supertest": "^6.3.4"
+
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "collectCoverage": true,
+    "coverageReporters": ["lcov", "text"],
+    "coverageDirectory": "coverage"
+
   }
 }
