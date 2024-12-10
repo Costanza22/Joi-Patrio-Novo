@@ -1,8 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CasaraoListPage from '../CasaraoListPage';
 
-// Mock fetch to prevent actual API calls during tests
+// Mock fetch para prevenir chamadas reais de API durante os testes
 global.fetch = jest.fn(() =>
   Promise.resolve({
     json: () => Promise.resolve([
@@ -12,9 +11,7 @@ global.fetch = jest.fn(() =>
 );
 
 describe('CasaraoListPage', () => {
-  beforeEach(() => {
-    fetch.mockClear();
-  });
+  beforeEach(() => fetch.mockClear());
 
   it('deve exibir o botão "Consultar Casarões"', () => {
     render(<CasaraoListPage isAdmin={true} />);
@@ -60,3 +57,4 @@ describe('CasaraoListPage', () => {
     expect(screen.queryByText('Casarão Teste')).not.toBeInTheDocument();
   });
 });
+
