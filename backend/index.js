@@ -8,9 +8,24 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const app = express();
-const server = app.listen(process.env.PORT || 3000);
 
-// Configuração do CORS mais específica
+
+// Configuração mais permissiva do CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
+
+// Mantenha também a configuração do cors
 app.use(cors({
   origin: 'https://joinville-version.vercel.app/',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -18,12 +33,13 @@ app.use(cors({
   credentials: true
 }));
 
+
 app.use(express.json({limit: '10mb'}));
 app.use(express.urlencoded({limit: '10mb', extended: true}));
+app.use(cors());
 
 // Servir arquivos estáticos da pasta 'uploads'
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-
 
 // Conexão ao banco de dados MySQL
 const db = mysql.createConnection({
@@ -79,7 +95,7 @@ app.post('/register', async (req, res) => {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const insertSql = 'INSERT INTO users (username, password) VALUES (?, ?)';
-      
+
       db.query(insertSql, [username, hashedPassword], (err, result) => {
         if (err) {
           console.error('Erro ao registrar usuário:', err);
@@ -176,7 +192,7 @@ app.put('/casaroes/:id', (req, res) => {
   // Cria uma consulta dinâmica com os campos que foram enviados
   let sql = 'UPDATE casaroes SET ';
   const values = [];
-  
+
   if (name) {
     sql += 'name = ?, ';
     values.push(name);
@@ -201,7 +217,7 @@ app.put('/casaroes/:id', (req, res) => {
     sql += 'image_path = ?, ';
     values.push(image_path);
   }
-  
+
   sql = sql.slice(0, -2) + ' WHERE id = ?';
   values.push(id);
 
@@ -210,7 +226,7 @@ app.put('/casaroes/:id', (req, res) => {
       console.error('Erro ao atualizar o casarão:', err);
       return res.status(500).json({ error: 'Erro ao atualizar o casarão' });
     }
-    
+
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'Casarão não encontrado' });
     }
@@ -229,7 +245,7 @@ app.delete('/casaroes/:id', (req, res) => {
       console.error('Erro ao excluir o casarão:', err);
       return res.status(500).json({ error: 'Erro ao excluir o casarão' });
     }
-    
+
     if (results.affectedRows === 0) {
       return res.status(404).json({ error: 'Casarão não encontrado' });
     }
@@ -251,7 +267,6 @@ app.post('/favorites', (req, res) => {
     res.status(201).json({ message: 'Favorito adicionado com sucesso' });
   });
 });
-
 // Rota para remover favorito
 app.delete('/favorites', (req, res) => {
   const { userId, casaraoId } = req.body;
@@ -265,7 +280,6 @@ app.delete('/favorites', (req, res) => {
     res.status(200).json({ message: 'Favorito removido com sucesso' });
   });
 });
-
 // Rota para adicionar visitado
 app.post('/visited', (req, res) => {
   const { userId, casaraoId, visitDate } = req.body;
@@ -279,7 +293,6 @@ app.post('/visited', (req, res) => {
     res.status(201).json({ message: 'Visita registrada com sucesso' });
   });
 });
-
 // Rota para remover visitado
 app.delete('/visited', (req, res) => {
   const { userId, casaraoId } = req.body;
@@ -293,7 +306,6 @@ app.delete('/visited', (req, res) => {
     res.status(200).json({ message: 'Visita removida com sucesso' });
   });
 });
-
 // Melhorar a rota de user-data para incluir visitados
 app.get('/user-data/:userId', (req, res) => {
   const { userId } = req.params;
@@ -331,5 +343,6 @@ app.get('/user-data/:userId', (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar dados do usuário' });
   });
 });
+export { app };
 
-export { app, server };
+// Inicia o servidor
