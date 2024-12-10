@@ -1,17 +1,20 @@
 export default {
   testEnvironment: 'node',
-  transform: {
-    '^.+\\.js$': 'babel-jest'
-  },
+  transform: {},
+  setupFilesAfterEnv: ['./tests/setup.js'],
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1.js'
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  testMatch: [
-    "**/__tests__/**/*.js?(x)",
-    "**/?(*.)+(spec|test).js?(x)"
+  reporters: [
+    'default',
+    [
+      'jest-html-reporter',
+      {
+        pageTitle: 'Relatório de Testes Unitários',
+        outputPath: 'test-report.html',
+        includeFailureMsg: true,
+        includeConsoleLog: true,
+      },
+    ],
   ],
-  collectCoverage: true,
-  coverageReporters: ['lcov', 'text'],
-  coverageDirectory: 'coverage'
 };
-

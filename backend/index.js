@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const app = express();
+const server = app.listen(process.env.PORT || 3000);
 
 
 // Configuração mais permissiva do CORS
@@ -348,9 +349,4 @@ app.get('/user-data/:userId', (req, res) => {
   });
 });
 
-export { app };
-
-// Inicia o servidor
-app.listen(5000, () => {
-  console.log('Servidor rodando');
-});
+export { app, server };

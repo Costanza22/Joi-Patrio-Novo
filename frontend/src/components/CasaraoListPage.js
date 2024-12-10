@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
 import CasaraoFormPage from './CasaraoFormPage';
 import { MdOutlineModeEdit, MdOutlineExitToApp } from 'react-icons/md';
 import { IoIosStarOutline, IoMdCheckmarkCircleOutline } from 'react-icons/io';
@@ -30,6 +32,8 @@ function CasaraoListPage({ isAdmin, onLogout }) {
   const [showInput, setShowInput] = useState(false); 
   const [suggestion, setSuggestion] = useState(''); 
   const [successMessage, setSuccessMessage] = useState(''); 
+
+  const [mapPosition, setMapPosition] = useState(null);
 
   const fetchCasaroes = async () => {
     try {
@@ -170,6 +174,28 @@ function CasaraoListPage({ isAdmin, onLogout }) {
       localStorage.setItem('comentarios', JSON.stringify(newComentarios));
       return newComentarios;
     });
+  };
+
+  const handleCepToCoordinates = async (cep) => {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (data.localidade) {
+        const endereco = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+        
+        // Fetch coordinates using a geocoding service
+        const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${endereco}`);
+        const geocodeData = await geocodeResponse.json();
+
+        if (geocodeData.length > 0) {
+          const { lat, lon } = geocodeData[0];
+          setMapPosition([lat, lon]);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao buscar CEP ou coordenadas:', error);
+    }
   };
 
   return (
@@ -341,6 +367,24 @@ function CasaraoListPage({ isAdmin, onLogout }) {
                       </div>
                     </>
                   )}
+
+                  {casarao.cep && (
+                    <button onClick={() => handleCepToCoordinates(casarao.cep)} style={styles.button}>
+                      Mostrar Mapa
+                    </button>
+                  )}
+                  {mapPosition && (
+                    <MapContainer center={mapPosition} zoom={15} style={{ height: '200px', width: '100%' }}>
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <Marker position={mapPosition} icon={L.icon({ iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-red.png', iconSize: [38, 95] })}>
+                        <Popup>
+                          {casarao.location}
+                        </Popup>
+                      </Marker>
+                    </MapContainer>
+                  )}
                 </li>
               ))}
             </ul>
@@ -368,7 +412,7 @@ function CasaraoListPage({ isAdmin, onLogout }) {
                 <li key={visitado.id}>{visitado.name}</li>
               ))
             ) : (
-              <p>Nenhum casarão visitado.</p>
+             <p>Nenhum casarão visitado.</p>
             )}
           </ul>
         </div>
