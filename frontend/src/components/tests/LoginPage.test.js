@@ -1,5 +1,5 @@
 import { render, fireEvent, screen } from '@testing-library/react';
-import LoginPage from './LoginPage';
+import LoginPage from './LoginPage.test.js'
 
 describe('LoginPage Component', () => {
   const mockOnLogin = jest.fn();
