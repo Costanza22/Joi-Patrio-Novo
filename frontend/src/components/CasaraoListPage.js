@@ -3,6 +3,7 @@ import CasaraoFormPage from './CasaraoFormPage';
 import { MdOutlineModeEdit, MdOutlineExitToApp } from 'react-icons/md';
 import { IoIosStarOutline, IoMdCheckmarkCircleOutline } from 'react-icons/io';
 import { BsFillPatchQuestionFill } from 'react-icons/bs';
+import { FaTrashAlt } from "react-icons/fa";
 
 
 function CasaraoListPage({ isAdmin, onLogout }) {
@@ -286,7 +287,7 @@ function CasaraoListPage({ isAdmin, onLogout }) {
                         <MdOutlineModeEdit /> Editar
                       </button>
                       <button onClick={() => handleDeleteCasarao(casarao.id)} style={styles.deleteButton}>
-                        Excluir
+                        <FaTrashAlt /> Excluir
                       </button>
                     </>
                   )}
