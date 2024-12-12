@@ -65,7 +65,11 @@ O projeto **Joi Patrio** nasceu para **preservar** e **promover** a história de
 - **Backend**: Node.js 🌐  
 - **Banco de Dados**: MySQL 🗃️  
 - **Monitoramento**: New Relic 📊  
-- **Infraestrutura**: Docker 🐳  
+- **Infraestrutura**: Docker 🐳
+
+## 🔍 **Testes Unitários** 
+<img width="989" alt="image" src="https://github.com/user-attachments/assets/80e469a1-37ca-4fd2-8bd9-8e2f70d066ed" />
+
 
 ---
 
