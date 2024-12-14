@@ -249,6 +249,11 @@ function CasaraoListPage({ isAdmin, onLogout }) {
           Cadastrar Novo Casarão
         </button>
       )}
+<a href="https://mapa-virtual.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+        <button style={styles.button}>
+          Mapa Virtual
+        </button>
+      </a>
       {showList && (
         <div style={styles.listContainer}>
           {error && <div style={{ color: 'red' }}>{error}</div>}
