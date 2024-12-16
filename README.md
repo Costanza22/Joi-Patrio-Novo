@@ -67,8 +67,21 @@ O projeto **Joi Patrio** nasceu para **preservar** e **promover** a história de
 - **Monitoramento**: New Relic 📊  
 - **Infraestrutura**: Docker 🐳
 
+# Acesso ao Sistema ⚛️
+
+* Visitante precisa se cadastrar para acessar o sistema. Caso já possua credenciais, utilize-as.  
+
+### Credenciais de Administrador  
+
+| **Login**     | **Senha** |
+|----------------|-----------|
+| costanza       | 123       |
+
+
 ## 🔍 **Testes Unitários** 
 <img width="989" alt="image" src="https://github.com/user-attachments/assets/80e469a1-37ca-4fd2-8bd9-8e2f70d066ed" />
+
+* Melhor jeito que achei para testar com Jest.
 
 
 ---
